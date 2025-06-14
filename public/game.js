@@ -68,12 +68,19 @@ class RadioDuckGame {
 
   setupCanvas() {
     const resizeCanvas = () => {
+      // Get the device's pixel ratio for high-DPI scaling
+      const dpr = window.devicePixelRatio || 1;
+
       // Get the actual display size of the canvas element
       const rect = this.canvas.getBoundingClientRect();
 
-      // Set canvas internal size to match display size for crisp rendering
-      this.canvas.width = rect.width;
-      this.canvas.height = rect.height;
+      // Set canvas internal size to match display size scaled by DPR
+      this.canvas.width = rect.width * dpr;
+      this.canvas.height = rect.height * dpr;
+
+      // Set CSS size to maintain original display size
+      this.canvas.style.width = `${rect.width}px`;
+      this.canvas.style.height = `${rect.height}px`;
     };
 
     // Initial resize
@@ -397,6 +404,7 @@ class RadioDuckGame {
   render() {
     if (!this.gameState || !this.canvas) return;
 
+    const dpr = window.devicePixelRatio || 1;
     const ctx = this.ctx;
     const width = this.canvas.width;
     const height = this.canvas.height;
@@ -408,9 +416,11 @@ class RadioDuckGame {
     // Find player's duck for camera following
     const myPlayer = this.gameState.players.find((p) => p.id === this.playerId);
 
-    // Calculate scale - much more zoomed in for mobile visibility
-    const baseScale = Math.min(width, height) / 300; // Much more zoom (was 500)
-    const scale = baseScale;
+    // Adjust scale for high-DPI displays
+    const displayWidth = width / dpr;
+    const displayHeight = height / dpr;
+    const baseScale = Math.min(displayWidth, displayHeight) / 300;
+    const scale = baseScale * dpr;
 
     // Center on player or arena center if player not found
     let cameraX = 0;
