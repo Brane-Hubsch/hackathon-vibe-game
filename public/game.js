@@ -148,7 +148,6 @@ class RadioDuckGame {
     this.socket.on("gameUpdate", (gameState) => {
       this.gameState = gameState;
       this.updateLobbyDisplay();
-      this.updateGameInfo();
 
       if (this.gameState.gameState === "waiting") {
         this.showScreen("lobbyScreen");
@@ -368,41 +367,22 @@ class RadioDuckGame {
       this.gameState.players.length >= 2 ? "block" : "none";
   }
 
-  updateGameInfo() {
-    if (!this.gameState) return;
-
-    if (this.gameState.gameState === "playing") {
-      const timeLeft = Math.ceil(this.gameState.timeLeft / 1000);
-      const minutes = Math.floor(timeLeft / 60);
-      const seconds = timeLeft % 60;
-      document.getElementById(
-        "timeLeft"
-      ).textContent = `Time: ${minutes}:${seconds.toString().padStart(2, "0")}`;
-
-      const alivePlayers = this.gameState.players.filter((p) => p.alive).length;
-      document.getElementById(
-        "playersAlive"
-      ).textContent = `Players: ${alivePlayers}`;
-    }
-  }
-
   showGameOver() {
+    this.showScreen("gameOverScreen");
     const winnerInfo = document.getElementById("winnerInfo");
+    const gameOverTitle = document.getElementById("gameOverTitle");
     if (this.gameState.winner) {
       if (this.gameState.winner.id === this.playerId) {
-        document.getElementById("gameOverTitle").textContent = "You Won! 🏆";
-        winnerInfo.innerHTML =
-          "<p>Congratulations! You are the last duck standing!</p>";
+        gameOverTitle.textContent = "You Won! 🏆";
+        winnerInfo.textContent = "Congratulations! You are the last duck standing!";
       } else {
-        document.getElementById("gameOverTitle").textContent = "Game Over";
-        winnerInfo.innerHTML = "<p>Another duck won this round!</p>";
+        gameOverTitle.textContent = "Game Over";
+        winnerInfo.textContent = "Another duck won this round!";
       }
     } else {
-      document.getElementById("gameOverTitle").textContent = "Game Over";
-      winnerInfo.innerHTML = "<p>No winner this round!</p>";
+      gameOverTitle.textContent = "Game Over";
+      winnerInfo.textContent = "It's a draw!";
     }
-
-    this.showScreen("gameOverScreen");
   }
 
   gameLoop() {
@@ -425,7 +405,7 @@ class RadioDuckGame {
     const height = this.canvas.height;
 
     // Clear canvas with soft cream background
-    ctx.fillStyle = "#faf9f7";
+    ctx.fillStyle = "#E8F9FF";
     ctx.fillRect(0, 0, width, height);
 
     // Find player's duck for camera following
@@ -468,24 +448,11 @@ class RadioDuckGame {
   drawArena(ctx) {
     const radius = 300;
 
-    // Draw arena background - slightly darker than game background
-    ctx.fillStyle = "#f0efe9";
-    ctx.beginPath();
-    ctx.arc(0, 0, radius, 0, Math.PI * 2);
-    ctx.fill();
-
     // Draw arena border
     ctx.strokeStyle = "#e74c3c";
     ctx.lineWidth = 8;
     ctx.beginPath();
     ctx.arc(0, 0, radius, 0, Math.PI * 2);
-    ctx.stroke();
-
-    // Draw warning zone
-    ctx.strokeStyle = "#f39c12";
-    ctx.lineWidth = 4;
-    ctx.beginPath();
-    ctx.arc(0, 0, radius - 40, 0, Math.PI * 2);
     ctx.stroke();
 
     // Draw center circle - darker for visibility on light background

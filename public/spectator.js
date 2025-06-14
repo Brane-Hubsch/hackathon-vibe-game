@@ -70,7 +70,7 @@ class RadioDuckSpectator {
     const height = this.canvas.height;
 
     // Clear canvas with soft cream background
-    ctx.fillStyle = "#faf9f7";
+    ctx.fillStyle = "#E8F9FF";
     ctx.fillRect(0, 0, width, height);
 
     // For spectators, show an overview of the entire arena
@@ -102,24 +102,11 @@ class RadioDuckSpectator {
   drawArena(ctx) {
     const radius = 300;
 
-    // Draw arena background - slightly darker than game background
-    ctx.fillStyle = "#f0efe9";
-    ctx.beginPath();
-    ctx.arc(0, 0, radius, 0, Math.PI * 2);
-    ctx.fill();
-
     // Draw arena border
     ctx.strokeStyle = "#e74c3c";
     ctx.lineWidth = 8;
     ctx.beginPath();
     ctx.arc(0, 0, radius, 0, Math.PI * 2);
-    ctx.stroke();
-
-    // Draw warning zone
-    ctx.strokeStyle = "#f39c12";
-    ctx.lineWidth = 4;
-    ctx.beginPath();
-    ctx.arc(0, 0, radius - 40, 0, Math.PI * 2);
     ctx.stroke();
 
     // Draw center circle - darker for visibility on light background
