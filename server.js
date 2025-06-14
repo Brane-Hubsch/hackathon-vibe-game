@@ -106,23 +106,29 @@ class Game {
     const player = this.players.get(playerId);
     if (!player || !player.alive) return;
 
-    const acceleration = 0.5;
+    const acceleration = 1; // Simplified acceleration
     const maxSpeed = 4;
-    const friction = 0.95;
-    const rotationSpeed = 0.1;
+    const friction = 0.9; // A bit more friction for snappier feel
 
-    // Handle input
-    if (input.left) player.angle -= rotationSpeed;
-    if (input.right) player.angle += rotationSpeed;
+    // Desired velocity from input
+    let dx = 0;
+    let dy = 0;
 
-    if (input.forward) {
-      player.vx += Math.cos(player.angle) * acceleration;
-      player.vy += Math.sin(player.angle) * acceleration;
+    if (input.left) dx -= 1;
+    if (input.right) dx += 1;
+    if (input.forward) dy -= 1;
+    if (input.backward) dy += 1;
+
+    // Normalize diagonal movement
+    if (dx !== 0 && dy !== 0) {
+      const length = Math.sqrt(dx * dx + dy * dy);
+      dx /= length;
+      dy /= length;
     }
-    if (input.backward) {
-      player.vx -= Math.cos(player.angle) * acceleration * 0.5;
-      player.vy -= Math.sin(player.angle) * acceleration * 0.5;
-    }
+
+    // Apply acceleration to velocity
+    player.vx += dx * acceleration;
+    player.vy += dy * acceleration;
 
     // Apply friction
     player.vx *= friction;
@@ -133,6 +139,17 @@ class Game {
     if (speed > maxSpeed) {
       player.vx = (player.vx / speed) * maxSpeed;
       player.vy = (player.vy / speed) * maxSpeed;
+    }
+
+    // Deadzone to prevent jittering when stopping
+    if (speed < 0.1) {
+      player.vx = 0;
+      player.vy = 0;
+    }
+
+    // Update angle to face the direction of movement
+    if (Math.abs(player.vx) > 0.1 || Math.abs(player.vy) > 0.1) {
+      player.angle = Math.atan2(player.vy, player.vx);
     }
 
     // Update position
