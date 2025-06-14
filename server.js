@@ -173,7 +173,11 @@ class Game {
     const player = this.players.get(playerId);
     if (!player || !player.alive) return;
 
-    const acceleration = 2; // Increased acceleration
+    // This turning logic is more direct. Instead of accumulating acceleration,
+    // we now steer the duck's velocity towards the desired direction. This makes
+    // turning much more responsive, as requested.
+    const turnFactor = 0.3; // Increased from 0.25 for more responsiveness
+    const maxSpeed = 12; // Must match maxSpeed in update()
 
     // Desired velocity from input
     let dx = 0;
@@ -184,38 +188,36 @@ class Game {
     if (input.forward) dy -= 1;
     if (input.backward) dy += 1;
 
-    // Normalize diagonal movement
-    if (dx !== 0 && dy !== 0) {
-      const length = Math.sqrt(dx * dx + dy * dy);
-      dx /= length;
-      dy /= length;
-    }
+    // If there is input, steer towards the target direction
+    if (dx !== 0 || dy !== 0) {
+      // Normalize diagonal movement
+      if (dx !== 0 && dy !== 0) {
+        const length = Math.sqrt(dx * dx + dy * dy);
+        dx /= length;
+        dy /= length;
+      }
 
-    // Apply acceleration to velocity
-    player.vx += dx * acceleration;
-    player.vy += dy * acceleration;
+      const targetVx = dx * maxSpeed;
+      const targetVy = dy * maxSpeed;
+
+      // Interpolate from current velocity to the target velocity
+      player.vx += (targetVx - player.vx) * turnFactor;
+      player.vy += (targetVy - player.vy) * turnFactor;
+    }
   }
 
   update() {
     const maxSpeed = 12; // Increased max speed
-    const friction = 0.9; // A bit more friction for snappier feel
+    const friction = 0.92; // Slightly reduced friction for a smoother stop
 
     this.players.forEach((player) => {
       if (!player.alive) return;
 
-      // Apply friction
       player.vx *= friction;
       player.vy *= friction;
 
-      // Limit speed
-      const speed = Math.sqrt(player.vx * player.vx + player.vy * player.vy);
-      if (speed > maxSpeed) {
-        player.vx = (player.vx / speed) * maxSpeed;
-        player.vy = (player.vy / speed) * maxSpeed;
-      }
-
       // Deadzone to prevent jittering when stopping
-      if (speed < 0.1) {
+      if (Math.sqrt(player.vx * player.vx + player.vy * player.vy) < 0.1) {
         player.vx = 0;
         player.vy = 0;
       }
