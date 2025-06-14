@@ -23,21 +23,6 @@
         <div class="container">
           <h1>🦆 Radio Duck Battle</h1>
           <p>Bump your opponents off the platform!</p>
-          <div class="form-group">
-            <input
-              type="text"
-              id="playerNameInput"
-              placeholder="Enter your name"
-              maxlength="15"
-            />
-          </div>
-          <div class="form-group">
-            <input
-              type="text"
-              id="lobbyIdInput"
-              placeholder="Lobby ID (optional)"
-            />
-          </div>
           <button id="joinGameBtn" class="btn btn-primary">Join Game</button>
         </div>
       </div>
@@ -45,19 +30,13 @@
       <!-- Lobby Screen -->
       <div id="lobbyScreen" class="screen">
         <div class="container">
-          <h2>Lobby</h2>
-          <div id="lobbyInfo">
-            <p>Lobby ID: <span id="currentLobbyId"></span></p>
-            <button id="copyLobbyBtn" class="btn btn-secondary">
-              Copy Lobby ID
-            </button>
-          </div>
+          <h2>Waiting for Players</h2>
           <div id="playersList">
-            <h3>Players:</h3>
+            <h3>Players in Game:</h3>
             <div id="playersContainer"></div>
           </div>
           <button id="startGameBtn" class="btn btn-primary">Start Game</button>
-          <p class="info">Share the lobby ID with friends to play together!</p>
+          <p class="info">Wait for more players to join, then start the game!</p>
         </div>
       </div>
 

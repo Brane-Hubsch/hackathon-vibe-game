@@ -14,6 +14,7 @@ app.use(express.static(path.join(__dirname, "public")));
 // Game state
 const lobbies = new Map();
 const players = new Map();
+const spectators = new Map(); // Track spectators
 
 // Game constants
 const GAME_CONFIG = {
@@ -44,7 +45,7 @@ class Game {
 
     this.players.set(playerId, {
       id: playerId,
-      name: playerData.name,
+      name: `Player ${this.players.size + 1}`, // Auto-generate simple names
       x: Math.cos(angle) * spawnRadius,
       y: Math.sin(angle) * spawnRadius,
       vx: 0,
@@ -251,20 +252,22 @@ io.on("connection", (socket) => {
   console.log("Player connected:", socket.id);
 
   socket.on("joinLobby", (data) => {
-    const { lobbyId, playerName } = data;
+    const { lobbyId } = data;
     let lobby;
 
-    if (lobbyId && lobbies.has(lobbyId)) {
-      lobby = lobbies.get(lobbyId);
+    // Use provided lobby ID or fallback to "main-game"
+    const targetLobbyId = lobbyId || "main-game";
+
+    if (lobbies.has(targetLobbyId)) {
+      lobby = lobbies.get(targetLobbyId);
     } else {
-      const newLobbyId = uuidv4();
-      lobby = new Game(newLobbyId);
-      lobbies.set(newLobbyId, lobby);
+      lobby = new Game(targetLobbyId);
+      lobbies.set(targetLobbyId, lobby);
     }
 
-    if (lobby.addPlayer(socket.id, { name: playerName })) {
+    if (lobby.addPlayer(socket.id, {})) {
       socket.join(lobby.id);
-      players.set(socket.id, { lobbyId: lobby.id, name: playerName });
+      players.set(socket.id, { lobbyId: lobby.id });
 
       socket.emit("joinedLobby", { lobbyId: lobby.id });
       io.to(lobby.id).emit("gameUpdate", lobby.getGameState());
@@ -293,9 +296,41 @@ io.on("connection", (socket) => {
     }
   });
 
+  // Spectator functionality
+  socket.on("spectateGame", (data) => {
+    const { lobbyId } = data;
+    const lobby = lobbies.get(lobbyId);
+
+    if (!lobby) {
+      socket.emit("gameNotFound");
+      return;
+    }
+
+    // Join the lobby room as a spectator
+    socket.join(lobby.id);
+    spectators.set(socket.id, { lobbyId: lobby.id });
+
+    socket.emit("spectateJoined", { lobbyId: lobby.id });
+    socket.emit("gameUpdate", lobby.getGameState());
+
+    // If game is already in progress, notify spectator
+    if (lobby.gameState === "playing") {
+      socket.emit("gameStarted", lobby.getGameState());
+    }
+  });
+
+  socket.on("leaveSpectate", () => {
+    const spectatorData = spectators.get(socket.id);
+    if (spectatorData) {
+      socket.leave(spectatorData.lobbyId);
+      spectators.delete(socket.id);
+    }
+  });
+
   socket.on("disconnect", () => {
     console.log("Player disconnected:", socket.id);
 
+    // Handle player disconnect
     const playerData = players.get(socket.id);
     if (playerData) {
       const lobby = lobbies.get(playerData.lobbyId);
@@ -308,6 +343,13 @@ io.on("connection", (socket) => {
         }
       }
       players.delete(socket.id);
+    }
+
+    // Handle spectator disconnect
+    const spectatorData = spectators.get(socket.id);
+    if (spectatorData) {
+      socket.leave(spectatorData.lobbyId);
+      spectators.delete(socket.id);
     }
   });
 });

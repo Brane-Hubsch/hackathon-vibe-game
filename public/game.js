@@ -79,20 +79,11 @@ class RadioDuckGame {
   setupEventListeners() {
     // Login form
     document.getElementById("joinGameBtn").addEventListener("click", () => {
-      const playerName = document
-        .getElementById("playerNameInput")
-        .value.trim();
-      const lobbyId = document.getElementById("lobbyIdInput").value.trim();
-
-      if (!playerName) {
-        alert("Please enter your name!");
-        return;
-      }
-
       // Enable audio context on user interaction
       this.enableAudio();
 
-      this.socket.emit("joinLobby", { playerName, lobbyId });
+      // Use hardcoded lobby ID and no name required
+      this.socket.emit("joinLobby", { lobbyId: "main-game" });
     });
 
     // Lobby controls
@@ -101,19 +92,6 @@ class RadioDuckGame {
     });
 
     // Test audio button removed - was causing errors
-
-    document.getElementById("copyLobbyBtn").addEventListener("click", () => {
-      if (this.lobbyId) {
-        navigator.clipboard.writeText(this.lobbyId).then(() => {
-          const btn = document.getElementById("copyLobbyBtn");
-          const originalText = btn.textContent;
-          btn.textContent = "Copied!";
-          setTimeout(() => {
-            btn.textContent = originalText;
-          }, 2000);
-        });
-      }
-    });
 
     // Game over controls
     document.getElementById("playAgainBtn").addEventListener("click", () => {
@@ -393,11 +371,11 @@ class RadioDuckGame {
     const container = document.getElementById("playersContainer");
     container.innerHTML = "";
 
-    this.gameState.players.forEach((player) => {
+    this.gameState.players.forEach((player, index) => {
       const playerCard = document.createElement("div");
       playerCard.className = "player-card";
       playerCard.style.borderColor = player.color;
-      playerCard.textContent = player.name;
+      playerCard.textContent = `Player ${index + 1}`;
       container.appendChild(playerCard);
     });
 
@@ -437,7 +415,7 @@ class RadioDuckGame {
           "<p>Congratulations! You are the last duck standing!</p>";
       } else {
         document.getElementById("gameOverTitle").textContent = "Game Over";
-        winnerInfo.innerHTML = `<p>Winner: <strong>${this.gameState.winner.name}</strong></p>`;
+        winnerInfo.innerHTML = "<p>Another player won this round!</p>";
       }
     } else {
       document.getElementById("gameOverTitle").textContent = "Game Over";
@@ -564,14 +542,7 @@ class RadioDuckGame {
       duckSize
     );
 
-    // Player name - bigger and more visible
-    ctx.fillStyle = "#ffffff";
-    ctx.font = "bold 14px Arial";
-    ctx.textAlign = "center";
-    ctx.strokeStyle = "#000000";
-    ctx.lineWidth = 3;
-    ctx.strokeText(player.name, 0, -28);
-    ctx.fillText(player.name, 0, -28);
+    // No player names displayed
 
     // Highlight own duck with pulsing effect
     if (player.id === this.playerId) {
