@@ -25,6 +25,15 @@ class RadioDuckGame {
       maxDistance: 40, // half the base radius minus knob radius
     };
 
+    // Load duck image
+    this.duckImage = new Image();
+    this.duckImage.src = "/images/duck.png";
+    this.duckImageLoaded = false;
+
+    this.duckImage.onload = () => {
+      this.duckImageLoaded = true;
+    };
+
     this.setupCanvas();
     this.setupEventListeners();
     this.setupSocketListeners();
@@ -449,66 +458,42 @@ class RadioDuckGame {
   }
 
   drawDuck(ctx, player) {
+    if (!this.duckImageLoaded) {
+      // Fallback: draw a simple circle if image isn't loaded yet
+      ctx.save();
+      ctx.translate(player.x, player.y);
+      ctx.fillStyle = player.color;
+      ctx.beginPath();
+      ctx.arc(0, 0, 15, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+      return;
+    }
+
     ctx.save();
     ctx.translate(player.x, player.y);
-    ctx.rotate(player.angle);
+    ctx.rotate(player.angle + Math.PI / 2); // Add 90-degree rotation to fix orientation
 
-    // Duck main body (large oval at bottom) - like in the image
+    // Apply player color tint to the duck image
+    ctx.globalCompositeOperation = "source-over";
+
+    // Draw the duck image (centered)
+    const duckSize = 40; // Adjust size as needed
+    ctx.drawImage(
+      this.duckImage,
+      -duckSize / 2,
+      -duckSize / 2,
+      duckSize,
+      duckSize
+    );
+
+    // Apply color tint for player identification
+    ctx.globalCompositeOperation = "multiply";
     ctx.fillStyle = player.color;
-    ctx.beginPath();
-    ctx.ellipse(0, 6, 16, 12, 0, 0, Math.PI * 2);
-    ctx.fill();
+    ctx.fillRect(-duckSize / 2, -duckSize / 2, duckSize, duckSize);
 
-    // Duck main body outline
-    ctx.strokeStyle = "#2c3e50";
-    ctx.lineWidth = 2;
-    ctx.beginPath();
-    ctx.ellipse(0, 6, 16, 12, 0, 0, Math.PI * 2);
-    ctx.stroke();
-
-    // Duck chest/upper body (medium circle) - lighter color like in image
-    ctx.fillStyle = this.lightenColor(player.color, 40);
-    ctx.beginPath();
-    ctx.arc(0, -2, 10, 0, Math.PI * 2);
-    ctx.fill();
-
-    // Duck chest outline
-    ctx.strokeStyle = "#2c3e50";
-    ctx.lineWidth = 2;
-    ctx.beginPath();
-    ctx.arc(0, -2, 10, 0, Math.PI * 2);
-    ctx.stroke();
-
-    // Duck head (small oval at top) - orange like in image
-    ctx.fillStyle = "#ff6b47";
-    ctx.beginPath();
-    ctx.ellipse(0, -12, 7, 5, 0, 0, Math.PI * 2);
-    ctx.fill();
-
-    // Duck head outline
-    ctx.strokeStyle = "#2c3e50";
-    ctx.lineWidth = 2;
-    ctx.beginPath();
-    ctx.ellipse(0, -12, 7, 5, 0, 0, Math.PI * 2);
-    ctx.stroke();
-
-    // Duck beak (small triangle pointing forward)
-    ctx.fillStyle = "#ff8c00";
-    ctx.beginPath();
-    ctx.moveTo(0, -14);
-    ctx.lineTo(5, -13);
-    ctx.lineTo(5, -11);
-    ctx.closePath();
-    ctx.fill();
-
-    // Duck eyes (two small black dots)
-    ctx.fillStyle = "#000000";
-    ctx.beginPath();
-    ctx.arc(-2, -13, 1, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.beginPath();
-    ctx.arc(2, -13, 1, 0, Math.PI * 2);
-    ctx.fill();
+    // Reset composite operation
+    ctx.globalCompositeOperation = "source-over";
 
     // Player name - bigger and more visible
     ctx.fillStyle = "#ffffff";
@@ -539,26 +524,6 @@ class RadioDuckGame {
     }
 
     ctx.restore();
-  }
-
-  // Helper function to lighten colors for duck head
-  lightenColor(color, percent) {
-    const num = parseInt(color.replace("#", ""), 16);
-    const amt = Math.round(2.55 * percent);
-    const R = (num >> 16) + amt;
-    const G = ((num >> 8) & 0x00ff) + amt;
-    const B = (num & 0x0000ff) + amt;
-    return (
-      "#" +
-      (
-        0x1000000 +
-        (R < 255 ? (R < 1 ? 0 : R) : 255) * 0x10000 +
-        (G < 255 ? (G < 1 ? 0 : G) : 255) * 0x100 +
-        (B < 255 ? (B < 1 ? 0 : B) : 255)
-      )
-        .toString(16)
-        .slice(1)
-    );
   }
 }
 
