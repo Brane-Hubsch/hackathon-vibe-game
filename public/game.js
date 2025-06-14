@@ -459,7 +459,7 @@ class RadioDuckGame {
     // Adjust scale for high-DPI displays
     const displayWidth = width / dpr;
     const displayHeight = height / dpr;
-    const baseScale = Math.min(displayWidth, displayHeight) / 300;
+    const baseScale = Math.min(displayWidth, displayHeight) / 500;
     const scale = baseScale * dpr;
 
     // Center on player or arena center if player not found

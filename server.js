@@ -14,7 +14,7 @@ app.use(express.static(path.join(__dirname, "public")));
 const GAME_CONFIG = {
   ARENA_RADIUS: 300,
   DUCK_SIZE: 25, // Increased to match larger duck visuals
-  MAX_PLAYERS: 20,
+  MAX_PLAYERS: 10,
   RESPAWN_TIME: 3000,
   GAME_DURATION: 300000, // 5 minutes
 };
