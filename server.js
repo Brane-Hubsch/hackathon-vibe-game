@@ -2,7 +2,6 @@ const express = require("express");
 const http = require("http");
 const socketIo = require("socket.io");
 const path = require("path");
-const { v4: uuidv4 } = require("uuid");
 
 const app = express();
 const server = http.createServer(app);
@@ -10,11 +9,6 @@ const io = socketIo(server);
 
 // Serve static files
 app.use(express.static(path.join(__dirname, "public")));
-
-// Game state
-const lobbies = new Map();
-const players = new Map();
-const spectators = new Map(); // Track spectators
 
 // Game constants
 const GAME_CONFIG = {
@@ -78,14 +72,31 @@ class Game {
   }
 
   startGame() {
-    if (this.players.size < 2) return false;
+    // This method can now be called at any time to start/restart.
+    if (this.players.size < 2) {
+      console.log("Spectator tried to start game with less than 2 players.");
+      return false;
+    }
 
+    console.log("Starting/restarting game...");
     this.gameState = "playing";
     this.startTime = Date.now();
+    this.winner = null;
 
-    // Reset all players
-    this.players.forEach((player) => {
-      player.alive = true;
+    // Reset all players to spawn positions
+    const playersArray = Array.from(this.players.values());
+
+    playersArray.forEach((player, index) => {
+      const angle = (index * (Math.PI * 2)) / GAME_CONFIG.MAX_PLAYERS;
+      const spawnRadius = GAME_CONFIG.ARENA_RADIUS * 0.7;
+
+      const p = this.players.get(player.id);
+      p.x = Math.cos(angle) * spawnRadius;
+      p.y = Math.sin(angle) * spawnRadius;
+      p.vx = 0;
+      p.vy = 0;
+      p.angle = angle + Math.PI;
+      p.alive = true;
     });
 
     return true;
@@ -227,6 +238,9 @@ class Game {
       (p) => p.alive
     );
     this.winner = alivePlayers.length > 0 ? alivePlayers[0] : null;
+
+    // The game stays in "finished" state. The spectator must restart it.
+    io.to(this.id).emit("gameUpdate", this.getGameState());
   }
 
   getGameState() {
@@ -246,20 +260,23 @@ class Game {
   }
 }
 
+// Game state
+const SINGLE_LOBBY_ID = "radio-duck-main-lobby";
+const lobbies = new Map();
+lobbies.set(SINGLE_LOBBY_ID, new Game(SINGLE_LOBBY_ID));
+const players = new Map();
+const spectators = new Map(); // Track spectators
+
 // Socket handling
 io.on("connection", (socket) => {
   console.log("Player connected:", socket.id);
 
-  socket.on("joinLobby", (data) => {
-    const { lobbyId } = data;
-    let lobby;
+  socket.on("joinLobby", () => {
+    const lobby = lobbies.get(SINGLE_LOBBY_ID);
 
-    if (lobbyId && lobbies.has(lobbyId)) {
-      lobby = lobbies.get(lobbyId);
-    } else {
-      const newLobbyId = uuidv4();
-      lobby = new Game(newLobbyId);
-      lobbies.set(newLobbyId, lobby);
+    if (!lobby) {
+      // This should not happen if the lobby is created at startup
+      return socket.emit("error", { message: "The game server is not ready." });
     }
 
     if (lobby.addPlayer(socket.id, {})) {
@@ -274,10 +291,9 @@ io.on("connection", (socket) => {
   });
 
   socket.on("startGame", () => {
-    const playerData = players.get(socket.id);
-    if (!playerData) return;
-
-    const lobby = lobbies.get(playerData.lobbyId);
+    // Spectator is not in the players map, so we don't look them up.
+    // We know they are in the single lobby's room.
+    const lobby = lobbies.get(SINGLE_LOBBY_ID);
     if (lobby && lobby.startGame()) {
       io.to(lobby.id).emit("gameStarted", lobby.getGameState());
     }
@@ -294,9 +310,8 @@ io.on("connection", (socket) => {
   });
 
   // Spectator functionality
-  socket.on("spectateGame", (data) => {
-    const { lobbyId } = data;
-    const lobby = lobbies.get(lobbyId);
+  socket.on("spectateGame", () => {
+    const lobby = lobbies.get(SINGLE_LOBBY_ID);
 
     if (!lobby) {
       socket.emit("gameNotFound");

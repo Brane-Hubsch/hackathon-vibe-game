@@ -15,46 +15,11 @@
     <meta name="apple-touch-fullscreen" content="yes" />
     <title>Radio Duck Battle - Spectator</title>
     <link rel="stylesheet" href="style.css" />
-    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
   </head>
   <body>
     <div id="app">
-      <!-- Spectator Join Screen -->
-      <div id="spectatorJoinScreen" class="screen active">
-        <div class="container">
-          <h1>🦆 Radio Duck Battle - Spectator</h1>
-          <p>Watch the battle unfold!</p>
-          <div class="form-group">
-            <input
-              type="text"
-              id="lobbyIdInput"
-              placeholder="Enter Lobby ID to spectate"
-              required
-            />
-          </div>
-          <button id="spectateBtn" class="btn btn-primary">Start Spectating</button>
-          <p class="info">Enter the lobby ID to watch the game in real-time</p>
-        </div>
-      </div>
-
-      <!-- Spectator Lobby Screen -->
-      <div id="spectatorLobbyScreen" class="screen">
-        <div class="container">
-          <h2>Spectating Lobby</h2>
-          <div id="lobbyInfo">
-            <p>Lobby ID: <span id="currentLobbyId"></span></p>
-            <p id="gameStatus">Waiting for game to start...</p>
-          </div>
-          <div id="playersList">
-            <h3>Players:</h3>
-            <div id="playersContainer"></div>
-          </div>
-          <p class="info">You are spectating this lobby. The game will start automatically when players are ready.</p>
-        </div>
-      </div>
-
       <!-- Spectator Game Screen -->
-      <div id="spectatorGameScreen" class="screen spectator-layout">
+      <div id="spectatorGameScreen" class="screen active spectator-layout">
         <div class="spectator-left">
           <div class="sumo-duck-logo">
             <span class="logo-text">SUMO</span>
@@ -74,42 +39,14 @@
             <canvas id="qrcode"></canvas>
             <div class="qr-text">JOIN THE GAME!</div>
           </div>
-        </div>
-        
-        <!-- Hidden elements for functionality -->
-        <div style="display: none;">
-          <div id="timeLeft">Time: 5:00</div>
-          <div id="playersAlive">Players: 0</div>
-          <div id="spectatorIndicator">👁️ SPECTATING</div>
-          <div id="scoresContainer"></div>
-          <button id="leaveLobbyBtn" class="btn btn-secondary">Leave Lobby</button>
-        </div>
-      </div>
-
-      <!-- Spectator Game Over Screen -->
-      <div id="spectatorGameOverScreen" class="screen">
-        <div class="container">
-          <h2 id="gameOverTitle">Game Over!</h2>
-          <div id="winnerInfo"></div>
-          <div id="finalScores">
-            <h3>Final Results:</h3>
-            <div id="finalScoresContainer"></div>
+          <div class="spectator-controls">
+            <button id="spectatorStartGameBtn" class="btn btn-primary">Start / Restart Game</button>
           </div>
-          <button id="spectateAgainBtn" class="btn btn-primary">Watch Next Game</button>
-          <button id="newSpectateBtn" class="btn btn-secondary">Spectate Different Lobby</button>
-        </div>
-      </div>
-
-      <!-- No Game Found Screen -->
-      <div id="noGameScreen" class="screen">
-        <div class="container">
-          <h2>No Game Found</h2>
-          <p>The lobby you're trying to spectate doesn't exist or has no active game.</p>
-          <button id="backToSpectateBtn" class="btn btn-primary">Try Another Lobby</button>
         </div>
       </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.4/lib/browser.min.js"></script>
     <script src="/socket.io/socket.io.js"></script>
     <script src="spectator.js"></script>
   </body>

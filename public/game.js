@@ -77,45 +77,6 @@ class RadioDuckGame {
   }
 
   setupEventListeners() {
-    // Login form
-    document.getElementById("joinGameBtn").addEventListener("click", () => {
-      const lobbyId = document.getElementById("lobbyIdInput").value.trim();
-
-      // Enable audio context on user interaction
-      this.enableAudio();
-
-      this.socket.emit("joinLobby", { lobbyId });
-    });
-
-    // Lobby controls
-    document.getElementById("startGameBtn").addEventListener("click", () => {
-      this.socket.emit("startGame");
-    });
-
-    // Test audio button removed - was causing errors
-
-    document.getElementById("copyLobbyBtn").addEventListener("click", () => {
-      if (this.lobbyId) {
-        navigator.clipboard.writeText(this.lobbyId).then(() => {
-          const btn = document.getElementById("copyLobbyBtn");
-          const originalText = btn.textContent;
-          btn.textContent = "Copied!";
-          setTimeout(() => {
-            btn.textContent = originalText;
-          }, 2000);
-        });
-      }
-    });
-
-    // Game over controls
-    document.getElementById("playAgainBtn").addEventListener("click", () => {
-      this.showScreen("lobbyScreen");
-    });
-
-    document.getElementById("newLobbyBtn").addEventListener("click", () => {
-      this.showScreen("loginScreen");
-    });
-
     // Touch controls
     this.setupJoystickControls();
 
@@ -168,6 +129,48 @@ class RadioDuckGame {
           this.input.right = false;
           break;
       }
+    });
+  }
+
+  setupSocketListeners() {
+    this.socket.on("connect", () => {
+      this.playerId = this.socket.id;
+      // Auto-join lobby on connect
+      this.enableAudio();
+      this.socket.emit("joinLobby");
+    });
+
+    this.socket.on("joinedLobby", (data) => {
+      this.lobbyId = data.lobbyId;
+      this.showScreen("lobbyScreen");
+    });
+
+    this.socket.on("gameUpdate", (gameState) => {
+      this.gameState = gameState;
+      this.updateLobbyDisplay();
+      this.updateGameInfo();
+
+      if (this.gameState.gameState === "waiting") {
+        this.showScreen("lobbyScreen");
+      } else if (this.gameState.gameState === "finished") {
+        this.showScreen("gameOverScreen");
+      }
+    });
+
+    this.socket.on("gameStarted", (gameState) => {
+      this.gameState = gameState;
+      this.showScreen("gameScreen");
+      this.playRandomQuack();
+    });
+
+    this.socket.on("error", (error) => {
+      alert(error.message);
+    });
+
+    this.socket.on("duckCollision", (data) => {
+      // Play quack sound when any duck collision happens
+      console.log("🦆 Duck collision - playing quack!");
+      this.playRandomQuack();
     });
   }
 
@@ -339,39 +342,6 @@ class RadioDuckGame {
       });
   }
 
-  setupSocketListeners() {
-    this.socket.on("connect", () => {
-      this.playerId = this.socket.id;
-    });
-
-    this.socket.on("joinedLobby", (data) => {
-      this.lobbyId = data.lobbyId;
-      document.getElementById("currentLobbyId").textContent = this.lobbyId;
-      this.showScreen("lobbyScreen");
-    });
-
-    this.socket.on("gameUpdate", (gameState) => {
-      this.gameState = gameState;
-      this.updateLobbyDisplay();
-      this.updateGameInfo();
-    });
-
-    this.socket.on("gameStarted", (gameState) => {
-      this.gameState = gameState;
-      this.showScreen("gameScreen");
-    });
-
-    this.socket.on("error", (error) => {
-      alert(error.message);
-    });
-
-    this.socket.on("duckCollision", (data) => {
-      // Play quack sound when any duck collision happens
-      console.log("🦆 Duck collision - playing quack!");
-      this.playRandomQuack();
-    });
-  }
-
   showScreen(screenId) {
     document.querySelectorAll(".screen").forEach((screen) => {
       screen.classList.remove("active");
@@ -413,10 +383,6 @@ class RadioDuckGame {
       document.getElementById(
         "playersAlive"
       ).textContent = `Players: ${alivePlayers}`;
-    }
-
-    if (this.gameState.gameState === "finished") {
-      this.showGameOver();
     }
   }
 

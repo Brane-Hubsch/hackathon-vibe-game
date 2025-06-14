@@ -103,195 +103,27 @@ class RadioDuckSpectator {
   }
 
   setupEventListeners() {
-    // Spectator join
-    document.getElementById("spectateBtn").addEventListener("click", () => {
-      const lobbyId = document.getElementById("lobbyIdInput").value.trim();
-
-      if (!lobbyId) {
-        alert("Please enter a lobby ID to spectate!");
-        return;
-      }
-
-      this.socket.emit("spectateGame", { lobbyId });
-    });
-
     // Spectator controls
-    document.getElementById("leaveLobbyBtn").addEventListener("click", () => {
-      this.socket.emit("leaveSpectate");
-      this.showScreen("spectatorJoinScreen");
-    });
-
-    document.getElementById("spectateAgainBtn").addEventListener("click", () => {
-      this.showScreen("spectatorLobbyScreen");
-    });
-
-    document.getElementById("newSpectateBtn").addEventListener("click", () => {
-      this.socket.emit("leaveSpectate");
-      this.showScreen("spectatorJoinScreen");
-    });
-
-    document.getElementById("backToSpectateBtn").addEventListener("click", () => {
-      this.showScreen("spectatorJoinScreen");
+    document.getElementById("spectatorStartGameBtn").addEventListener("click", () => {
+      this.socket.emit("startGame");
     });
   }
 
   setupSocketListeners() {
     this.socket.on("connect", () => {
-      console.log("Connected as spectator");
-    });
-
-    this.socket.on("spectateJoined", (data) => {
-      this.lobbyId = data.lobbyId;
-      document.getElementById("currentLobbyId").textContent = this.lobbyId;
-      this.showScreen("spectatorLobbyScreen");
+      console.log("Connected as spectator, joining main lobby...");
+      this.socket.emit("spectateGame");
     });
 
     this.socket.on("gameUpdate", (gameState) => {
       this.gameState = gameState;
-      this.updateLobbyDisplay();
-      this.updateGameInfo();
     });
-
-    this.socket.on("gameStarted", (gameState) => {
-      this.gameState = gameState;
-      this.showScreen("spectatorGameScreen");
-    });
-
-    this.socket.on("gameNotFound", () => {
-      this.showScreen("noGameScreen");
-    });
-
-    this.socket.on("error", (error) => {
-      alert(error.message);
-      this.showScreen("spectatorJoinScreen");
-    });
-  }
-
-  showScreen(screenId) {
-    document.querySelectorAll(".screen").forEach((screen) => {
-      screen.classList.remove("active");
-    });
-    document.getElementById(screenId).classList.add("active");
-  }
-
-  updateLobbyDisplay() {
-    if (!this.gameState) return;
-
-    const container = document.getElementById("playersContainer");
-    if (!container) return;
-    
-    container.innerHTML = "";
-
-    this.gameState.players.forEach((player, index) => {
-      const playerCard = document.createElement("div");
-      playerCard.className = "player-card";
-      playerCard.style.borderColor = player.color;
-      playerCard.textContent = `Duck ${index + 1}`;
-      container.appendChild(playerCard);
-    });
-
-    // Update game status
-    const gameStatus = document.getElementById("gameStatus");
-    if (gameStatus) {
-      switch (this.gameState.gameState) {
-        case "waiting":
-          gameStatus.textContent = "Waiting for players...";
-          break;
-        case "lobby":
-          gameStatus.textContent = "Players are preparing to start...";
-          break;
-        case "playing":
-          gameStatus.textContent = "Game in progress!";
-          break;
-        case "finished":
-          gameStatus.textContent = "Game finished!";
-          break;
-        default:
-          gameStatus.textContent = "Unknown game state";
-      }
-    }
-  }
-
-  updateGameInfo() {
-    if (!this.gameState) return;
-
-    if (this.gameState.gameState === "playing") {
-      const timeLeft = Math.ceil(this.gameState.timeLeft / 1000);
-      const minutes = Math.floor(timeLeft / 60);
-      const seconds = timeLeft % 60;
-      
-      const timeElement = document.getElementById("timeLeft");
-      if (timeElement) {
-        timeElement.textContent = `Time: ${minutes}:${seconds.toString().padStart(2, "0")}`;
-      }
-
-      const alivePlayers = this.gameState.players.filter((p) => p.alive).length;
-      const playersElement = document.getElementById("playersAlive");
-      if (playersElement) {
-        playersElement.textContent = `Players: ${alivePlayers}`;
-      }
-    }
-
-    if (this.gameState.gameState === "finished") {
-      this.showGameOver();
-    }
-  }
-
-  showGameOver() {
-    const winnerInfo = document.getElementById("winnerInfo");
-    const finalScoresContainer = document.getElementById("finalScoresContainer");
-    
-    if (this.gameState.winner) {
-      document.getElementById("gameOverTitle").textContent = "Game Over!";
-      if (winnerInfo) {
-        winnerInfo.innerHTML = "<p>🏆 A duck won this round!</p>";
-      }
-    } else {
-      document.getElementById("gameOverTitle").textContent = "Game Over";
-      if (winnerInfo) {
-        winnerInfo.innerHTML = "<p>No winner this round!</p>";
-      }
-    }
-
-    // Show final scores
-    if (finalScoresContainer) {
-      finalScoresContainer.innerHTML = "";
-      
-      // Sort players by alive status (alive first, then by name)
-      const sortedPlayers = [...this.gameState.players].sort((a, b) => {
-        if (a.alive && !b.alive) return -1;
-        if (!a.alive && b.alive) return 1;
-        return a.name.localeCompare(b.name);
-      });
-
-      sortedPlayers.forEach((player, index) => {
-        const playerResult = document.createElement("div");
-        playerResult.className = "player-result";
-        playerResult.style.padding = "12px";
-        playerResult.style.margin = "8px 0";
-        playerResult.style.borderLeft = `4px solid ${player.color}`;
-        playerResult.style.backgroundColor = index === 0 && player.alive ? "rgba(255, 215, 0, 0.2)" : "rgba(255,255,255,0.1)";
-        
-        const position = player.alive ? "🏆 Winner" : `💀 Eliminated`;
-        const playerNumber = this.gameState.players.indexOf(player) + 1;
-        playerResult.innerHTML = `
-          <div style="font-weight: bold; font-size: 1.1em;">Duck ${playerNumber}</div>
-          <div style="color: #ccc;">${position}</div>
-        `;
-        
-        finalScoresContainer.appendChild(playerResult);
-      });
-    }
-
-    this.showScreen("spectatorGameOverScreen");
   }
 
   gameLoop() {
-    if (this.gameState && (this.gameState.gameState === "playing" || this.gameState.gameState === "finished")) {
-      // Render game (no input sending for spectators)
+    if (this.gameState) {
       this.render();
     }
-
     requestAnimationFrame(() => this.gameLoop());
   }
 

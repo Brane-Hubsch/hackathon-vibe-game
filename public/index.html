@@ -18,38 +18,15 @@
   </head>
   <body>
     <div id="app">
-      <!-- Login Screen -->
-      <div id="loginScreen" class="screen active">
-        <div class="container">
-          <h1>🦆 Radio Duck Battle</h1>
-          <p>Bump your opponents off the platform!</p>
-          <div class="form-group">
-            <input
-              type="text"
-              id="lobbyIdInput"
-              placeholder="Lobby ID (optional)"
-            />
-          </div>
-          <button id="joinGameBtn" class="btn btn-primary">Join Game</button>
-        </div>
-      </div>
-
       <!-- Lobby Screen -->
-      <div id="lobbyScreen" class="screen">
+      <div id="lobbyScreen" class="screen active">
         <div class="container">
           <h2>Lobby</h2>
-          <div id="lobbyInfo">
-            <p>Lobby ID: <span id="currentLobbyId"></span></p>
-            <button id="copyLobbyBtn" class="btn btn-secondary">
-              Copy Lobby ID
-            </button>
-          </div>
           <div id="playersList">
-            <h3>Players:</h3>
+            <h3>Players Joined:</h3>
             <div id="playersContainer"></div>
           </div>
-          <button id="startGameBtn" class="btn btn-primary">Start Game</button>
-          <p class="info">Share the lobby ID with friends to play together!</p>
+          <p class="info">Waiting for the game to start...</p>
         </div>
       </div>
 
@@ -81,8 +58,7 @@
         <div class="container">
           <h2 id="gameOverTitle">Game Over!</h2>
           <div id="winnerInfo"></div>
-          <button id="playAgainBtn" class="btn btn-primary">Play Again</button>
-          <button id="newLobbyBtn" class="btn btn-secondary">New Lobby</button>
+          <p class="info">Waiting for the next game to start.</p>
         </div>
       </div>
     </div>
