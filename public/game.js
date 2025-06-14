@@ -326,20 +326,23 @@ class RadioDuckGame {
   updateLobbyDisplay() {
     if (!this.gameState) return;
 
-    const container = document.getElementById("playersContainer");
-    container.innerHTML = "";
+    // Find the current player to show their duck name
+    const myPlayer = this.gameState.players.find(
+      (player) => player.id === this.playerId
+    );
 
-    this.gameState.players.forEach((player, index) => {
-      const playerCard = document.createElement("div");
-      playerCard.className = "player-card";
-      playerCard.style.borderColor = player.color;
-      playerCard.textContent = `Duck ${index + 1}`;
-      container.appendChild(playerCard);
-    });
+    if (myPlayer) {
+      const userDuckNameElement = document.getElementById("userDuckName");
+      if (userDuckNameElement) {
+        userDuckNameElement.textContent = myPlayer.name || "Duck";
+      }
+    }
 
     const startBtn = document.getElementById("startGameBtn");
-    startBtn.style.display =
-      this.gameState.players.length >= 2 ? "block" : "none";
+    if (startBtn) {
+      startBtn.style.display =
+        this.gameState.players.length >= 2 ? "block" : "none";
+    }
   }
 
   showGameOver() {

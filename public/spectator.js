@@ -91,10 +91,10 @@ class RadioDuckSpectator {
       this.gameState.winner
     ) {
       // Show winner display
-      const winnerIndex = this.gameState.players.findIndex(
+      const winner = this.gameState.players.find(
         (player) => player.id === this.gameState.winner.id
       );
-      const displayName = `Duck ${winnerIndex + 1}`;
+      const displayName = winner ? winner.name : "Unknown Duck";
       winnerName.textContent = displayName;
       winnerDisplay.classList.add("show");
 

@@ -19,6 +19,40 @@ const GAME_CONFIG = {
   GAME_DURATION: 300000, // 5 minutes
 };
 
+// Funny duck names for players
+const DUCK_NAMES = [
+  "Quackers McGillicuddy",
+  "Sir Paddington",
+  "Waddles Von Flippers",
+  "Captain Quackbeard",
+  "Duchess Featherbutt",
+  "Professor Mallard",
+  "Squeaky McSplash",
+  "Admiral Duckworth",
+  "Lady Quackalot",
+  "Baron Von Waddle",
+  "Sir Flapsalot",
+  "Puddles the Great",
+  "Count Quackula",
+  "Commodore Splash",
+  "Princess Peep",
+  "Duke Duckington",
+  "Sir Honks-a-Lot",
+  "Captain Featherbottom",
+  "Madame Quacksworth",
+  "General Gobbles",
+  "Lord Splashington",
+  "Dame Duckface",
+  "Sir Squeaks",
+  "Admiral Paddlefoot",
+  "Baroness Billsworth",
+  "Commander Quack",
+  "Lady Webfoot",
+  "Earl of Pondshire",
+  "Sir Rubber Ducky",
+  "Captain Mallardface",
+];
+
 class Game {
   constructor(lobbyId) {
     this.id = lobbyId;
@@ -29,6 +63,26 @@ class Game {
     this.lastCollisions = new Map(); // Track collision cooldowns
     this.lastSentState = null;
     this.lastCollisionSounds = new Map(); // Track collision sound cooldowns
+    this.usedNames = new Set(); // Track used duck names to avoid duplicates
+  }
+
+  getRandomDuckName() {
+    // Get available names (not used yet)
+    const availableNames = DUCK_NAMES.filter(
+      (name) => !this.usedNames.has(name)
+    );
+
+    // If all names are used, reset and start over (shouldn't happen with 30 names and max 6 players)
+    if (availableNames.length === 0) {
+      this.usedNames.clear();
+      return DUCK_NAMES[Math.floor(Math.random() * DUCK_NAMES.length)];
+    }
+
+    // Pick a random available name
+    const randomName =
+      availableNames[Math.floor(Math.random() * availableNames.length)];
+    this.usedNames.add(randomName);
+    return randomName;
   }
 
   addPlayer(playerId, playerData) {
@@ -41,6 +95,7 @@ class Game {
 
     this.players.set(playerId, {
       id: playerId,
+      name: this.getRandomDuckName(), // Add random duck name
       x: Math.cos(angle) * spawnRadius,
       y: Math.sin(angle) * spawnRadius,
       vx: 0,
@@ -55,6 +110,10 @@ class Game {
   }
 
   removePlayer(playerId) {
+    const player = this.players.get(playerId);
+    if (player && player.name) {
+      this.usedNames.delete(player.name); // Free up the name for reuse
+    }
     this.players.delete(playerId);
     if (this.players.size <= 1 && this.gameState === "playing") {
       this.endGame();

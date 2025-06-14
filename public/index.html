@@ -22,9 +22,8 @@
       <div id="lobbyScreen" class="screen active">
         <div class="container">
           <h2>Welcome to SumoDuck!</h2>
-          <div id="playersList">
-            <h3>Players Joined:</h3>
-            <div id="playersContainer"></div>
+          <div id="userDuckInfo">
+            <h3>You are: <span id="userDuckName">Loading...</span></h3>
           </div>
           <p class="info">Waiting for the game to start...</p>
         </div>
@@ -35,8 +34,7 @@
         <div id="gameContainer">
           <div id="gameView">
             <canvas id="gameCanvas"></canvas>
-            <div id="gameUI">
-            </div>
+            <div id="gameUI"></div>
           </div>
           <div id="controlsArea">
             <div id="controls">
