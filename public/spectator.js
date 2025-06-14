@@ -31,6 +31,7 @@ class RadioDuckSpectator {
       console.warn("Winner sound failed to load:", e);
     });
 
+    this.countdownSound = new Audio("/audio/countdown.mp3");
     this.startSound = new Audio("/audio/sumoduck_4.mp3");
 
     this.setupCanvas();
@@ -59,9 +60,14 @@ class RadioDuckSpectator {
     document
       .getElementById("spectatorStartGameBtn")
       .addEventListener("click", () => {
-        this.startSound.currentTime = 0;
-        this.startSound.play();
+        this.countdownSound.currentTime = 0;
+        this.countdownSound.play();
         this.socket.emit("startGame");
+
+        setTimeout(() => {
+          this.startSound.currentTime = 0;
+          this.startSound.play();
+        }, 2000);
       });
   }
 

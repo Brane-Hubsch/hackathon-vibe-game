@@ -165,7 +165,7 @@ class RadioDuckGame {
       this.showScreen("gameScreen");
       const countdownElement = document.getElementById("countdown");
       countdownElement.style.display = "block";
-      let count = 3;
+      let count = 2;
       countdownElement.textContent = count;
 
       const countdownInterval = setInterval(() => {
