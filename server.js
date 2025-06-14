@@ -45,7 +45,7 @@ class Game {
 
     this.players.set(playerId, {
       id: playerId,
-      name: `Player ${this.players.size + 1}`, // Auto-generate simple names
+      name: playerData.name,
       x: Math.cos(angle) * spawnRadius,
       y: Math.sin(angle) * spawnRadius,
       vx: 0,
@@ -252,22 +252,20 @@ io.on("connection", (socket) => {
   console.log("Player connected:", socket.id);
 
   socket.on("joinLobby", (data) => {
-    const { lobbyId } = data;
+    const { lobbyId, playerName } = data;
     let lobby;
 
-    // Use provided lobby ID or fallback to "main-game"
-    const targetLobbyId = lobbyId || "main-game";
-
-    if (lobbies.has(targetLobbyId)) {
-      lobby = lobbies.get(targetLobbyId);
+    if (lobbyId && lobbies.has(lobbyId)) {
+      lobby = lobbies.get(lobbyId);
     } else {
-      lobby = new Game(targetLobbyId);
-      lobbies.set(targetLobbyId, lobby);
+      const newLobbyId = uuidv4();
+      lobby = new Game(newLobbyId);
+      lobbies.set(newLobbyId, lobby);
     }
 
-    if (lobby.addPlayer(socket.id, {})) {
+    if (lobby.addPlayer(socket.id, { name: playerName })) {
       socket.join(lobby.id);
-      players.set(socket.id, { lobbyId: lobby.id });
+      players.set(socket.id, { lobbyId: lobby.id, name: playerName });
 
       socket.emit("joinedLobby", { lobbyId: lobby.id });
       io.to(lobby.id).emit("gameUpdate", lobby.getGameState());
