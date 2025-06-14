@@ -18,7 +18,7 @@ const players = new Map();
 // Game constants
 const GAME_CONFIG = {
   ARENA_RADIUS: 300,
-  DUCK_SIZE: 20,
+  DUCK_SIZE: 25, // Increased to match larger duck visuals
   MAX_PLAYERS: 6,
   RESPAWN_TIME: 3000,
   GAME_DURATION: 300000, // 5 minutes
@@ -31,6 +31,7 @@ class Game {
     this.gameState = "waiting"; // waiting, playing, finished
     this.startTime = null;
     this.winner = null;
+    this.lastCollisions = new Map(); // Track collision cooldowns
   }
 
   addPlayer(playerId, playerData) {
@@ -140,6 +141,9 @@ class Game {
   handleCollisions() {
     const players = Array.from(this.players.values()).filter((p) => p.alive);
 
+    // Debug: Only log when we have players to check
+    // (Removed excessive logging since audio is working)
+
     for (let i = 0; i < players.length; i++) {
       for (let j = i + 1; j < players.length; j++) {
         const p1 = players[i];
@@ -150,24 +154,59 @@ class Game {
         const distance = Math.sqrt(dx * dx + dy * dy);
 
         if (distance < GAME_CONFIG.DUCK_SIZE) {
-          // Enhanced collision response with more push force
+          // Check collision cooldown to prevent getting stuck
+          const collisionKey = `${p1.id}-${p2.id}`;
+          const reverseKey = `${p2.id}-${p1.id}`;
+          const now = Date.now();
+          const cooldownTime = 200; // 200ms cooldown between same pair collisions
+
+          const lastCollision = Math.max(
+            this.lastCollisions.get(collisionKey) || 0,
+            this.lastCollisions.get(reverseKey) || 0
+          );
+
+          if (now - lastCollision < cooldownTime) {
+            continue; // Skip this collision, still in cooldown
+          }
+
+          console.log(
+            `Duck collision: ${p1.name} vs ${
+              p2.name
+            } (distance: ${distance.toFixed(1)})`
+          );
+
+          // Much more aggressive separation to prevent sticking
           const overlap = GAME_CONFIG.DUCK_SIZE - distance;
-          const separateX = (dx / distance) * overlap * 0.5;
-          const separateY = (dy / distance) * overlap * 0.5;
+          const separationForce = 2.0; // Increased separation force
+          const separateX = (dx / distance) * overlap * separationForce;
+          const separateY = (dy / distance) * overlap * separationForce;
 
           p1.x -= separateX;
           p1.y -= separateY;
           p2.x += separateX;
           p2.y += separateY;
 
-          // More aggressive velocity transfer for better bumping
-          const pushForce = 1.2; // Increased from default
+          // Much stronger velocity transfer for bouncy collisions
+          const pushForce = 2.5; // Significantly increased from 1.2
+          const velocityTransfer = 0.5; // Reduced velocity transfer to make bounces cleaner
           const tempVx = p1.vx;
           const tempVy = p1.vy;
-          p1.vx = p2.vx * 0.7 + (dx / distance) * pushForce;
-          p1.vy = p2.vy * 0.7 + (dy / distance) * pushForce;
-          p2.vx = tempVx * 0.7 - (dx / distance) * pushForce;
-          p2.vy = tempVy * 0.7 - (dy / distance) * pushForce;
+
+          p1.vx = p2.vx * velocityTransfer + (dx / distance) * pushForce;
+          p1.vy = p2.vy * velocityTransfer + (dy / distance) * pushForce;
+          p2.vx = tempVx * velocityTransfer - (dx / distance) * pushForce;
+          p2.vy = tempVy * velocityTransfer - (dy / distance) * pushForce;
+
+          // Record collision time for cooldown
+          this.lastCollisions.set(collisionKey, now);
+
+          // Emit collision sound event to all players in the lobby
+          io.to(this.id).emit("duckCollision", {
+            player1: p1.id,
+            player2: p2.id,
+            x: (p1.x + p2.x) / 2,
+            y: (p1.y + p2.y) / 2,
+          });
         }
       }
     }

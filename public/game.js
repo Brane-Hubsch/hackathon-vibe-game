@@ -34,6 +34,27 @@ class RadioDuckGame {
       this.duckImageLoaded = true;
     };
 
+    // Load quack sound effects
+    this.quackSounds = [];
+    this.soundsLoaded = 0;
+
+    for (let i = 1; i <= 7; i++) {
+      const audio = new Audio(`/audio/quack${i}.mp3`);
+      audio.preload = "auto";
+      audio.volume = 1; // Adjust volume as needed
+
+      audio.addEventListener("canplaythrough", () => {
+        this.soundsLoaded++;
+        console.log(`Quack${i}.mp3 loaded (${this.soundsLoaded}/7)`);
+      });
+
+      audio.addEventListener("error", (e) => {
+        console.error(`Failed to load quack${i}.mp3:`, e);
+      });
+
+      this.quackSounds.push(audio);
+    }
+
     this.setupCanvas();
     this.setupEventListeners();
     this.setupSocketListeners();
@@ -68,6 +89,9 @@ class RadioDuckGame {
         return;
       }
 
+      // Enable audio context on user interaction
+      this.enableAudio();
+
       this.socket.emit("joinLobby", { playerName, lobbyId });
     });
 
@@ -75,6 +99,8 @@ class RadioDuckGame {
     document.getElementById("startGameBtn").addEventListener("click", () => {
       this.socket.emit("startGame");
     });
+
+    // Test audio button removed - was causing errors
 
     document.getElementById("copyLobbyBtn").addEventListener("click", () => {
       if (this.lobbyId) {
@@ -273,6 +299,54 @@ class RadioDuckGame {
     this.input.right = false;
   }
 
+  enableAudio() {
+    // Pre-load and enable audio on user interaction
+    console.log("Enabling audio with", this.quackSounds.length, "quack sounds");
+
+    this.quackSounds.forEach((audio, index) => {
+      audio.load();
+      // Test play one sound to unlock audio context
+      if (index === 0) {
+        audio
+          .play()
+          .then(() => {
+            console.log("Audio context unlocked successfully");
+            audio.pause();
+            audio.currentTime = 0;
+          })
+          .catch((error) => {
+            console.log("Audio unlock failed:", error);
+          });
+      }
+    });
+  }
+
+  playRandomQuack() {
+    if (this.quackSounds.length === 0) {
+      console.log("No quack sounds loaded");
+      return;
+    }
+
+    // Pick a random quack sound
+    const randomIndex = Math.floor(Math.random() * this.quackSounds.length);
+    const selectedQuack = this.quackSounds[randomIndex];
+
+    console.log(`Playing quack${randomIndex + 1}.mp3`);
+
+    // Reset the audio to beginning in case it was already playing
+    selectedQuack.currentTime = 0;
+
+    // Play the sound (with error handling for browser audio policies)
+    selectedQuack
+      .play()
+      .then(() => {
+        console.log("Quack played successfully");
+      })
+      .catch((error) => {
+        console.log("Audio play failed:", error);
+      });
+  }
+
   setupSocketListeners() {
     this.socket.on("connect", () => {
       this.playerId = this.socket.id;
@@ -297,6 +371,12 @@ class RadioDuckGame {
 
     this.socket.on("error", (error) => {
       alert(error.message);
+    });
+
+    this.socket.on("duckCollision", (data) => {
+      // Play quack sound when any duck collision happens
+      console.log("🦆 Duck collision - playing quack!");
+      this.playRandomQuack();
     });
   }
 
@@ -464,7 +544,7 @@ class RadioDuckGame {
       ctx.translate(player.x, player.y);
       ctx.fillStyle = player.color;
       ctx.beginPath();
-      ctx.arc(0, 0, 15, 0, Math.PI * 2);
+      ctx.arc(0, 0, 20, 0, Math.PI * 2); // Increased to match new duck size
       ctx.fill();
       ctx.restore();
       return;
@@ -475,7 +555,7 @@ class RadioDuckGame {
     ctx.rotate(player.angle + Math.PI / 2); // Add 90-degree rotation to fix orientation
 
     // Draw the duck image (centered) - no color tinting needed
-    const duckSize = 40; // Adjust size as needed
+    const duckSize = 50; // Increased size for cuter, easier to hit ducks
     ctx.drawImage(
       this.duckImage,
       -duckSize / 2,
@@ -498,7 +578,7 @@ class RadioDuckGame {
       ctx.strokeStyle = "#ffffff";
       ctx.lineWidth = 4;
       ctx.beginPath();
-      ctx.arc(0, 0, 28, 0, Math.PI * 2); // Increased from 22 to 28
+      ctx.arc(0, 0, 32, 0, Math.PI * 2); // Adjusted for larger duck size
       ctx.stroke();
 
       // Add a subtle glow effect
@@ -507,7 +587,7 @@ class RadioDuckGame {
       ctx.strokeStyle = "rgba(255, 255, 255, 0.5)";
       ctx.lineWidth = 2;
       ctx.beginPath();
-      ctx.arc(0, 0, 32, 0, Math.PI * 2); // Increased from 25 to 32
+      ctx.arc(0, 0, 36, 0, Math.PI * 2); // Adjusted for larger duck size
       ctx.stroke();
       ctx.shadowBlur = 0;
     }
