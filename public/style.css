@@ -236,8 +236,7 @@ input::placeholder {
   width: 100%;
   height: 100%;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.2);
-  border: 3px solid rgba(255, 255, 255, 0.4);
+  background: rgba(255, 255, 255, 0.3);
   position: absolute;
   top: 0;
   left: 0;
@@ -247,8 +246,7 @@ input::placeholder {
   width: 60px;
   height: 60px;
   border-radius: 50%;
-  background: linear-gradient(45deg, #ff6b6b, #ff8e8e);
-  border: 3px solid rgba(255, 255, 255, 0.8);
+  background: rgba(255, 255, 255, 0.8);
   position: absolute;
   top: 50%;
   left: 50%;
