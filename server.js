@@ -413,7 +413,7 @@ io.on("connection", (socket) => {
     // Spectator is not in the players map, so we don't look them up.
     // We know they are in the single lobby's room.
     const lobby = lobbies.get(SINGLE_LOBBY_ID);
-    if (lobby && lobby.gameState === "waiting") {
+    if (lobby) {
       io.to(lobby.id).emit("game-starting");
 
       setTimeout(() => {

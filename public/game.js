@@ -19,6 +19,8 @@ class RadioDuckGame {
     this.inputThrottleMs = 33; // Send input max every 33ms (30 FPS)
     this.lastInput = { ...this.input };
 
+    this.isStarting = false;
+
     // Joystick state
     this.joystick = {
       active: false,
@@ -165,6 +167,7 @@ class RadioDuckGame {
     });
 
     this.socket.on("game-starting", () => {
+      this.isStarting = true;
       this.showScreen("gameScreen");
       const countdownElement = document.getElementById("countdown");
       countdownElement.style.display = "block";
@@ -180,22 +183,28 @@ class RadioDuckGame {
         } else {
           clearInterval(countdownInterval);
           countdownElement.style.display = "none";
+          this.isStarting = false; // Reset flag when countdown is done
         }
       }, 1000);
     });
 
     this.socket.on("gameUpdate", (gameState) => {
+      if (this.isStarting && gameState.gameState === "finished") {
+        // Game is starting, ignore 'finished' state updates to prevent flicker
+        return;
+      }
       this.gameState = gameState;
       this.updateLobbyDisplay();
 
       if (this.gameState.gameState === "waiting") {
         this.showScreen("lobbyScreen");
       } else if (this.gameState.gameState === "finished") {
-        this.showScreen("gameOverScreen");
+        this.showGameOver();
       }
     });
 
     this.socket.on("gameStarted", (gameState) => {
+      this.isStarting = false; // Make sure it's false when game starts
       this.gameState = gameState;
       this.showScreen("gameScreen");
       this.updatePlayerNameDisplay(); // Ensure name is shown in game HUD
@@ -397,7 +406,7 @@ class RadioDuckGame {
     this.showScreen("gameOverScreen");
     const winnerInfo = document.getElementById("winnerInfo");
     const gameOverTitle = document.getElementById("gameOverTitle");
-    if (this.gameState.winner) {
+    if (this.gameState && this.gameState.winner) {
       if (this.gameState.winner.id === this.playerId) {
         gameOverTitle.textContent = "You Won! 🏆";
         winnerInfo.textContent =
