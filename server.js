@@ -66,7 +66,13 @@ class Game {
     this.usedNames = new Set(); // Track used duck names to avoid duplicates
   }
 
-  getRandomDuckName() {
+  getRandomDuckName(preferredName = null) {
+    // If a preferred name is provided and not currently used, use it
+    if (preferredName && !this.usedNames.has(preferredName)) {
+      this.usedNames.add(preferredName);
+      return preferredName;
+    }
+
     // Get available names (not used yet)
     const availableNames = DUCK_NAMES.filter(
       (name) => !this.usedNames.has(name)
@@ -93,9 +99,11 @@ class Game {
     const angle = (this.players.size * (Math.PI * 2)) / GAME_CONFIG.MAX_PLAYERS;
     const spawnRadius = GAME_CONFIG.ARENA_RADIUS * 0.7;
 
+    const assignedName = this.getRandomDuckName(playerData.preferredName);
+
     this.players.set(playerId, {
       id: playerId,
-      name: this.getRandomDuckName(), // Add random duck name
+      name: assignedName,
       x: Math.cos(angle) * spawnRadius,
       y: Math.sin(angle) * spawnRadius,
       vx: 0,
@@ -106,7 +114,7 @@ class Game {
       color: this.getPlayerColor(this.players.size),
     });
 
-    return true;
+    return assignedName; // Return the assigned name
   }
 
   removePlayer(playerId) {
@@ -375,7 +383,7 @@ const spectators = new Map(); // Track spectators
 
 // Socket handling
 io.on("connection", (socket) => {
-  socket.on("joinLobby", () => {
+  socket.on("joinLobby", (data = {}) => {
     const lobby = lobbies.get(SINGLE_LOBBY_ID);
 
     if (!lobby) {
@@ -383,11 +391,18 @@ io.on("connection", (socket) => {
       return socket.emit("error", { message: "The game server is not ready." });
     }
 
-    if (lobby.addPlayer(socket.id, {})) {
+    const assignedName = lobby.addPlayer(socket.id, {
+      preferredName: data.preferredName,
+    });
+
+    if (assignedName) {
       socket.join(lobby.id);
       players.set(socket.id, { lobbyId: lobby.id });
 
-      socket.emit("joinedLobby", { lobbyId: lobby.id });
+      socket.emit("joinedLobby", {
+        lobbyId: lobby.id,
+        playerName: assignedName,
+      });
       io.to(lobby.id).emit("gameUpdate", lobby.getGameState());
     } else {
       socket.emit("error", { message: "Lobby is full" });

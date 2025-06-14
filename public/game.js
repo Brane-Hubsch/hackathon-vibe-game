@@ -144,11 +144,20 @@ class RadioDuckGame {
       this.playerId = this.socket.id;
       // Auto-join lobby on connect
       this.enableAudio();
-      this.socket.emit("joinLobby");
+
+      // Get stored duck name from localStorage if available
+      const storedDuckName = localStorage.getItem("sumoduck_player_name");
+      this.socket.emit("joinLobby", { preferredName: storedDuckName });
     });
 
     this.socket.on("joinedLobby", (data) => {
       this.lobbyId = data.lobbyId;
+
+      // Store the assigned duck name in localStorage for future sessions
+      if (data.playerName) {
+        localStorage.setItem("sumoduck_player_name", data.playerName);
+      }
+
       this.showScreen("lobbyScreen");
     });
 
