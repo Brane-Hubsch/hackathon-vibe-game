@@ -349,10 +349,6 @@ io.on("connection", (socket) => {
       if (lobby) {
         lobby.removePlayer(socket.id);
         io.to(lobby.id).emit("gameUpdate", lobby.getGameState());
-
-        if (lobby.players.size === 0) {
-          lobbies.delete(lobby.id);
-        }
       }
       players.delete(socket.id);
     }

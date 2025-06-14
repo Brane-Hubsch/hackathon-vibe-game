@@ -6,8 +6,8 @@
 
 body {
   font-family: "Arial", sans-serif;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
+  background: #FFB200;
+  color: #000;
   height: 100vh;
   overflow: hidden;
   -webkit-user-select: none;
@@ -53,19 +53,17 @@ body {
   border: 1px solid rgba(255, 255, 255, 0.2);
   text-align: center;
   max-width: 90%;
-  width: 400px;
+  width: 480px;
 }
 
 h1 {
   font-size: 2.5em;
   margin-bottom: 10px;
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 h2 {
   font-size: 2em;
   margin-bottom: 20px;
-  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
 }
 
 p {
@@ -143,7 +141,6 @@ input::placeholder {
   background: rgba(255, 255, 255, 0.2);
   padding: 10px 15px;
   border-radius: 15px;
-  border: 2px solid;
   font-weight: bold;
 }
 
@@ -425,7 +422,6 @@ input[type="text"] {
   border-radius: 20px;
   position: relative;
   overflow: hidden;
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
 }
 
 #spectatorGameScreen #gameCanvas {
