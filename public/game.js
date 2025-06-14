@@ -6,6 +6,7 @@ class RadioDuckGame {
     this.gameState = null;
     this.playerId = null;
     this.lobbyId = null;
+    this.playerName = null;
     this.input = {
       forward: false,
       backward: false,
@@ -156,6 +157,8 @@ class RadioDuckGame {
       // Store the assigned duck name in localStorage for future sessions
       if (data.playerName) {
         localStorage.setItem("sumoduck_player_name", data.playerName);
+        this.playerName = data.playerName;
+        this.updatePlayerNameDisplay();
       }
 
       this.showScreen("lobbyScreen");
@@ -195,6 +198,7 @@ class RadioDuckGame {
     this.socket.on("gameStarted", (gameState) => {
       this.gameState = gameState;
       this.showScreen("gameScreen");
+      this.updatePlayerNameDisplay(); // Ensure name is shown in game HUD
       this.playRandomQuack();
     });
 
@@ -352,6 +356,22 @@ class RadioDuckGame {
     document.getElementById(screenId).classList.add("active");
   }
 
+  updatePlayerNameDisplay() {
+    if (!this.playerName) return;
+
+    // Update lobby display
+    const userDuckNameElement = document.getElementById("userDuckName");
+    if (userDuckNameElement) {
+      userDuckNameElement.textContent = this.playerName;
+    }
+
+    // Update in-game HUD display
+    const playerNameText = document.getElementById("playerNameText");
+    if (playerNameText) {
+      playerNameText.textContent = this.playerName;
+    }
+  }
+
   updateLobbyDisplay() {
     if (!this.gameState) return;
 
@@ -360,11 +380,10 @@ class RadioDuckGame {
       (player) => player.id === this.playerId
     );
 
-    if (myPlayer) {
-      const userDuckNameElement = document.getElementById("userDuckName");
-      if (userDuckNameElement) {
-        userDuckNameElement.textContent = myPlayer.name || "Duck";
-      }
+    if (myPlayer && !this.playerName) {
+      // Store the player name if we don't have it yet
+      this.playerName = myPlayer.name;
+      this.updatePlayerNameDisplay();
     }
 
     const startBtn = document.getElementById("startGameBtn");
