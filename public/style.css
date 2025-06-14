@@ -8,7 +8,7 @@ body {
   font-family: "Arial", sans-serif;
   background: #FFB200;
   color: #000;
-  height: 100vh;
+  height: 100dvh;
   overflow: hidden;
   -webkit-user-select: none;
   -moz-user-select: none;

@@ -179,63 +179,46 @@ class RadioDuckGame {
 
     if (!joystickBase || !joystickKnob) return;
 
-    // Get base center position
     const updateBasePosition = () => {
       const rect = joystickBase.getBoundingClientRect();
       this.joystick.baseX = rect.left + rect.width / 2;
       this.joystick.baseY = rect.top + rect.height / 2;
     };
 
-    // Touch events
-    joystickBase.addEventListener("touchstart", (e) => {
+    const startJoystick = (e, pointer) => {
       e.preventDefault();
       updateBasePosition();
       this.joystick.active = true;
-      this.handleJoystickMove(e.touches[0]);
-    });
+      this.handleJoystickMove(pointer);
+    };
 
-    document.addEventListener("touchmove", (e) => {
+    const moveJoystick = (e, pointer) => {
       if (this.joystick.active) {
         e.preventDefault();
-        this.handleJoystickMove(e.touches[0]);
+        this.handleJoystickMove(pointer);
       }
-    });
+    };
 
-    document.addEventListener("touchend", (e) => {
+    const endJoystick = (e) => {
       if (this.joystick.active) {
         e.preventDefault();
         this.joystick.active = false;
         this.resetJoystick();
       }
+    };
+
+    const elements = [joystickBase, joystickKnob];
+    elements.forEach(el => {
+        el.addEventListener("touchstart", (e) => startJoystick(e, e.touches[0]));
+        el.addEventListener("mousedown", (e) => startJoystick(e, e));
+        el.addEventListener("contextmenu", (e) => e.preventDefault());
     });
 
-    // Mouse events for desktop testing
-    joystickBase.addEventListener("mousedown", (e) => {
-      e.preventDefault();
-      updateBasePosition();
-      this.joystick.active = true;
-      this.handleJoystickMove(e);
-    });
+    document.addEventListener("touchmove", (e) => moveJoystick(e, e.touches[0]));
+    document.addEventListener("mousemove", (e) => moveJoystick(e, e));
+    document.addEventListener("touchend", endJoystick);
+    document.addEventListener("mouseup", endJoystick);
 
-    document.addEventListener("mousemove", (e) => {
-      if (this.joystick.active) {
-        e.preventDefault();
-        this.handleJoystickMove(e);
-      }
-    });
-
-    document.addEventListener("mouseup", (e) => {
-      if (this.joystick.active) {
-        e.preventDefault();
-        this.joystick.active = false;
-        this.resetJoystick();
-      }
-    });
-
-    // Prevent context menu
-    joystickBase.addEventListener("contextmenu", (e) => e.preventDefault());
-
-    // Initial position update
     setTimeout(updateBasePosition, 100);
   }
 
