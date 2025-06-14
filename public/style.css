@@ -165,7 +165,7 @@ input::placeholder {
   width: 100%;
   height: 50%;
   position: relative;
-  background: #2c3e50;
+  background: #faf9f7;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -176,7 +176,7 @@ input::placeholder {
   width: 100%;
   height: 100%;
   display: block;
-  background: #2c3e50;
+  background: #faf9f7;
   touch-action: none;
   -webkit-touch-callout: none;
   -webkit-tap-highlight-color: transparent;

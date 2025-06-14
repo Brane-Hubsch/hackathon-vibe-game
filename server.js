@@ -150,7 +150,7 @@ class Game {
         const distance = Math.sqrt(dx * dx + dy * dy);
 
         if (distance < GAME_CONFIG.DUCK_SIZE) {
-          // Simple collision response
+          // Enhanced collision response with more push force
           const overlap = GAME_CONFIG.DUCK_SIZE - distance;
           const separateX = (dx / distance) * overlap * 0.5;
           const separateY = (dy / distance) * overlap * 0.5;
@@ -160,13 +160,14 @@ class Game {
           p2.x += separateX;
           p2.y += separateY;
 
-          // Exchange some velocity
+          // More aggressive velocity transfer for better bumping
+          const pushForce = 1.2; // Increased from default
           const tempVx = p1.vx;
           const tempVy = p1.vy;
-          p1.vx = p2.vx * 0.8;
-          p1.vy = p2.vy * 0.8;
-          p2.vx = tempVx * 0.8;
-          p2.vy = tempVy * 0.8;
+          p1.vx = p2.vx * 0.7 + (dx / distance) * pushForce;
+          p1.vy = p2.vy * 0.7 + (dy / distance) * pushForce;
+          p2.vx = tempVx * 0.7 - (dx / distance) * pushForce;
+          p2.vy = tempVy * 0.7 - (dy / distance) * pushForce;
         }
       }
     }

@@ -386,8 +386,8 @@ class RadioDuckGame {
     const width = this.canvas.width;
     const height = this.canvas.height;
 
-    // Clear canvas
-    ctx.fillStyle = "#2c3e50";
+    // Clear canvas with soft cream background
+    ctx.fillStyle = "#faf9f7";
     ctx.fillRect(0, 0, width, height);
 
     // Find player's duck for camera following
@@ -430,8 +430,8 @@ class RadioDuckGame {
   drawArena(ctx) {
     const radius = 300;
 
-    // Draw arena background
-    ctx.fillStyle = "#34495e";
+    // Draw arena background - slightly darker than game background
+    ctx.fillStyle = "#f0efe9";
     ctx.beginPath();
     ctx.arc(0, 0, radius, 0, Math.PI * 2);
     ctx.fill();
@@ -450,8 +450,8 @@ class RadioDuckGame {
     ctx.arc(0, 0, radius - 40, 0, Math.PI * 2);
     ctx.stroke();
 
-    // Draw center circle
-    ctx.fillStyle = "#95a5a6";
+    // Draw center circle - darker for visibility on light background
+    ctx.fillStyle = "#7f8c8d";
     ctx.beginPath();
     ctx.arc(0, 0, 20, 0, Math.PI * 2);
     ctx.fill();
@@ -474,10 +474,7 @@ class RadioDuckGame {
     ctx.translate(player.x, player.y);
     ctx.rotate(player.angle + Math.PI / 2); // Add 90-degree rotation to fix orientation
 
-    // Apply player color tint to the duck image
-    ctx.globalCompositeOperation = "source-over";
-
-    // Draw the duck image (centered)
+    // Draw the duck image (centered) - no color tinting needed
     const duckSize = 40; // Adjust size as needed
     ctx.drawImage(
       this.duckImage,
@@ -486,14 +483,6 @@ class RadioDuckGame {
       duckSize,
       duckSize
     );
-
-    // Apply color tint for player identification
-    ctx.globalCompositeOperation = "multiply";
-    ctx.fillStyle = player.color;
-    ctx.fillRect(-duckSize / 2, -duckSize / 2, duckSize, duckSize);
-
-    // Reset composite operation
-    ctx.globalCompositeOperation = "source-over";
 
     // Player name - bigger and more visible
     ctx.fillStyle = "#ffffff";
@@ -509,7 +498,7 @@ class RadioDuckGame {
       ctx.strokeStyle = "#ffffff";
       ctx.lineWidth = 4;
       ctx.beginPath();
-      ctx.arc(0, 0, 22, 0, Math.PI * 2);
+      ctx.arc(0, 0, 28, 0, Math.PI * 2); // Increased from 22 to 28
       ctx.stroke();
 
       // Add a subtle glow effect
@@ -518,7 +507,7 @@ class RadioDuckGame {
       ctx.strokeStyle = "rgba(255, 255, 255, 0.5)";
       ctx.lineWidth = 2;
       ctx.beginPath();
-      ctx.arc(0, 0, 25, 0, Math.PI * 2);
+      ctx.arc(0, 0, 32, 0, Math.PI * 2); // Increased from 25 to 32
       ctx.stroke();
       ctx.shadowBlur = 0;
     }
