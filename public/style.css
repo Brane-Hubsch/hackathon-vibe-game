@@ -14,6 +14,11 @@ body {
   -moz-user-select: none;
   -ms-user-select: none;
   user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  -webkit-text-size-adjust: 100%;
+  -ms-text-size-adjust: 100%;
 }
 
 #app {
@@ -152,6 +157,19 @@ input::placeholder {
   width: 100%;
   height: 100%;
   position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+#gameView {
+  width: 100%;
+  height: 50%;
+  position: relative;
+  background: #2c3e50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
 }
 
 #gameCanvas {
@@ -159,6 +177,10 @@ input::placeholder {
   height: 100%;
   display: block;
   background: #2c3e50;
+  touch-action: none;
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
+  object-fit: contain;
 }
 
 #gameUI {
@@ -169,6 +191,16 @@ input::placeholder {
   height: 100%;
   pointer-events: none;
   z-index: 10;
+}
+
+#controlsArea {
+  width: 100%;
+  height: 50%;
+  background: linear-gradient(135deg, #ffa726 0%, #ff9800 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
 }
 
 #gameInfo {
@@ -189,44 +221,42 @@ input::placeholder {
 }
 
 #controls {
-  position: absolute;
-  bottom: 30px;
-  left: 50%;
-  transform: translateX(-50%);
+  position: relative;
   pointer-events: all;
 }
 
-.control-row {
-  display: flex;
-  justify-content: center;
-  gap: 10px;
-  margin-bottom: 10px;
+#joystick {
+  position: relative;
+  width: 140px;
+  height: 140px;
+  pointer-events: all;
 }
 
-.control-btn {
+#joystickBase {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+  border: 3px solid rgba(255, 255, 255, 0.4);
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+#joystickKnob {
   width: 60px;
   height: 60px;
-  border: none;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.9);
-  color: #333;
-  font-size: 24px;
-  font-weight: bold;
-  cursor: pointer;
-  transition: all 0.1s ease;
-  border: 3px solid rgba(255, 255, 255, 0.3);
-  -webkit-tap-highlight-color: transparent;
-}
-
-.control-btn:active {
-  background: rgba(255, 255, 255, 0.7);
-  transform: scale(0.95);
-}
-
-.control-btn.pressed {
   background: linear-gradient(45deg, #ff6b6b, #ff8e8e);
-  color: white;
-  transform: scale(0.9);
+  border: 3px solid rgba(255, 255, 255, 0.8);
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  transition: all 0.1s ease;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: none;
 }
 
 /* Responsive design */
@@ -244,10 +274,14 @@ input::placeholder {
     font-size: 1.5em;
   }
 
-  .control-btn {
+  #joystick {
+    width: 120px;
+    height: 120px;
+  }
+
+  #joystickKnob {
     width: 50px;
     height: 50px;
-    font-size: 20px;
   }
 
   #gameInfo {
@@ -263,14 +297,14 @@ input::placeholder {
 }
 
 @media (max-height: 600px) {
-  .control-btn {
-    width: 45px;
-    height: 45px;
-    font-size: 18px;
+  #joystick {
+    width: 110px;
+    height: 110px;
   }
 
-  #controls {
-    bottom: 20px;
+  #joystickKnob {
+    width: 45px;
+    height: 45px;
   }
 }
 
@@ -292,8 +326,8 @@ input::placeholder {
 }
 
 /* Touch improvements */
-.control-btn {
-  touch-action: manipulation;
+#joystick {
+  touch-action: none;
 }
 
 input {

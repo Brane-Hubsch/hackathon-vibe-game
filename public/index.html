@@ -4,9 +4,16 @@
     <meta charset="UTF-8" />
     <meta
       name="viewport"
-      content="width=device-width, initial-scale=1.0, user-scalable=no"
+      content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0, minimum-scale=1.0, shrink-to-fit=no"
     />
-    <title>Radio Car Battle</title>
+    <meta name="format-detection" content="telephone=no" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta
+      name="apple-mobile-web-app-status-bar-style"
+      content="black-translucent"
+    />
+    <meta name="apple-touch-fullscreen" content="yes" />
+    <title>Radio Duck Battle</title>
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
@@ -14,7 +21,7 @@
       <!-- Login Screen -->
       <div id="loginScreen" class="screen active">
         <div class="container">
-          <h1>🚗 Radio Car Battle</h1>
+          <h1>🦆 Radio Duck Battle</h1>
           <p>Bump your opponents off the platform!</p>
           <div class="form-group">
             <input
@@ -57,20 +64,20 @@
       <!-- Game Screen -->
       <div id="gameScreen" class="screen">
         <div id="gameContainer">
-          <canvas id="gameCanvas"></canvas>
-          <div id="gameUI">
-            <div id="gameInfo">
-              <div id="timeLeft">Time: 5:00</div>
-              <div id="playersAlive">Players: 0</div>
-            </div>
-            <div id="controls">
-              <div class="control-row">
-                <button id="forwardBtn" class="control-btn">↑</button>
+          <div id="gameView">
+            <canvas id="gameCanvas"></canvas>
+            <div id="gameUI">
+              <div id="gameInfo">
+                <div id="timeLeft">Time: 5:00</div>
+                <div id="playersAlive">Players: 0</div>
               </div>
-              <div class="control-row">
-                <button id="leftBtn" class="control-btn">←</button>
-                <button id="backwardBtn" class="control-btn">↓</button>
-                <button id="rightBtn" class="control-btn">→</button>
+            </div>
+          </div>
+          <div id="controlsArea">
+            <div id="controls">
+              <div id="joystick">
+                <div id="joystickBase"></div>
+                <div id="joystickKnob"></div>
               </div>
             </div>
           </div>

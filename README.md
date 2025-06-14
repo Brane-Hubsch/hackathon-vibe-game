@@ -1,12 +1,12 @@
-# 🚗 Radio Car Battle
+# 🦆 Duck Battle Arena
 
-A multiplayer web-based bumper car game where players try to push each other off a circular platform. The last car standing wins!
+A multiplayer web-based duck battle game where players control cute ducks trying to push each other off a circular platform. The last duck standing wins!
 
 ## 🎮 Features
 
 - **Multiplayer Gameplay**: Up to 6 players can compete in the same lobby
 - **Mobile Optimized**: Designed for mobile browsers with touch controls
-- **Real-time Physics**: Smooth car movement and collision detection
+- **Real-time Physics**: Smooth duck movement and collision detection
 - **Lobby System**: Create or join lobbies with friends using lobby IDs
 - **Cross-Platform**: Works on desktop and mobile devices
 
@@ -30,19 +30,19 @@ A multiplayer web-based bumper car game where players try to push each other off
    - **Desktop**: Use arrow keys or WASD
    - **Forward**: Accelerate in the direction you're facing
    - **Backward**: Reverse (slower than forward)
-   - **Left/Right**: Turn your car
+   - **Left/Right**: Turn your duck
 
 4. **Objective**:
-   - Bump into other players to push them around
+   - Bump into other ducks to push them around
    - Try to push opponents off the circular platform
    - Avoid falling off yourself
-   - Be the last car standing to win!
+   - Be the last duck standing to win!
 
 ## 🎯 Game Mechanics
 
 - **Arena**: Circular platform with warning zones near the edge
-- **Physics**: Realistic car movement with momentum and friction
-- **Collisions**: Cars bounce off each other when they collide
+- **Physics**: Realistic duck movement with momentum and friction
+- **Collisions**: Ducks bounce off each other when they collide
 - **Fall Off**: Players are eliminated when they fall off the platform
 - **Timer**: 5-minute maximum game duration
 
@@ -92,7 +92,7 @@ The game is designed to work on servers with Node.js and Caddy. Make sure your s
 
 - **Responsive Design**: Adapts to different screen sizes
 - **Touch Controls**: Optimized for mobile gameplay
-- **Visual Feedback**: Clear indicators for your car and game state
+- **Visual Feedback**: Clear indicators for your duck and game state
 - **Real-time Updates**: Instant synchronization between players
 - **Lobby Management**: Easy lobby creation and joining
 
@@ -101,7 +101,7 @@ The game is designed to work on servers with Node.js and Caddy. Make sure your s
 - **Backend**: Node.js with Express and Socket.io
 - **Frontend**: HTML5 Canvas with vanilla JavaScript
 - **Real-time Communication**: WebSocket-based multiplayer
-- **Physics**: Custom 2D physics engine for car movement
+- **Physics**: Custom 2D physics engine for duck movement
 - **Mobile Support**: Touch events and responsive design
 
 ## 📱 Mobile Optimization

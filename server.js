@@ -18,7 +18,7 @@ const players = new Map();
 // Game constants
 const GAME_CONFIG = {
   ARENA_RADIUS: 300,
-  CAR_SIZE: 20,
+  DUCK_SIZE: 20,
   MAX_PLAYERS: 6,
   RESPAWN_TIME: 3000,
   GAME_DURATION: 300000, // 5 minutes
@@ -149,9 +149,9 @@ class Game {
         const dy = p2.y - p1.y;
         const distance = Math.sqrt(dx * dx + dy * dy);
 
-        if (distance < GAME_CONFIG.CAR_SIZE) {
+        if (distance < GAME_CONFIG.DUCK_SIZE) {
           // Simple collision response
-          const overlap = GAME_CONFIG.CAR_SIZE - distance;
+          const overlap = GAME_CONFIG.DUCK_SIZE - distance;
           const separateX = (dx / distance) * overlap * 0.5;
           const separateY = (dy / distance) * overlap * 0.5;
 
@@ -284,5 +284,5 @@ setInterval(() => {
 
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {
-  console.log(`Radio Car Game server running on port ${PORT}`);
+  console.log(`Radio Duck Game server running on port ${PORT}`);
 });

@@ -1,7 +1,7 @@
 {
-  "name": "radio-car-game",
+  "name": "radio-duck-game",
   "version": "1.0.0",
-  "description": "Multiplayer radio car bumper game",
+  "description": "Multiplayer radio duck battle game",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
@@ -18,8 +18,8 @@
   "keywords": [
     "game",
     "multiplayer",
-    "cars",
-    "bumper"
+    "ducks",
+    "battle"
   ],
   "author": "",
   "license": "MIT"
