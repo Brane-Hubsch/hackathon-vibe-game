@@ -188,6 +188,18 @@ input::placeholder {
   height: 100%;
   pointer-events: none;
   z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#countdown {
+  font-size: 20vw;
+  font-weight: bold;
+  color: white;
+  text-shadow: 0 0 15px rgba(0, 0, 0, 0.7), 0 0 30px rgba(0, 0, 0, 0.5);
+  font-family: "Arial Black", Gadget, sans-serif;
+  -webkit-text-stroke: 2px black;
 }
 
 #controlsArea {

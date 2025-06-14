@@ -152,6 +152,26 @@ class RadioDuckGame {
       this.showScreen("lobbyScreen");
     });
 
+    this.socket.on("game-starting", () => {
+      this.showScreen("gameScreen");
+      const countdownElement = document.getElementById("countdown");
+      countdownElement.style.display = "block";
+      let count = 3;
+      countdownElement.textContent = count;
+
+      const countdownInterval = setInterval(() => {
+        count--;
+        if (count > 0) {
+          countdownElement.textContent = count;
+        } else if (count === 0) {
+          countdownElement.textContent = "GO!";
+        } else {
+          clearInterval(countdownInterval);
+          countdownElement.style.display = "none";
+        }
+      }, 1000);
+    });
+
     this.socket.on("gameUpdate", (gameState) => {
       this.gameState = gameState;
       this.updateLobbyDisplay();
