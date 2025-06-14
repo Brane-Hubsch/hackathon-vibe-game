@@ -108,8 +108,8 @@ class Game {
     const player = this.players.get(playerId);
     if (!player || !player.alive) return;
 
-    const acceleration = 1.5; // Increased acceleration
-    const maxSpeed = 6; // Increased max speed
+    const acceleration = 2; // Increased acceleration
+    const maxSpeed = 12; // Increased max speed
     const friction = 0.9; // A bit more friction for snappier feel
 
     // Desired velocity from input
