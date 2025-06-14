@@ -53,7 +53,35 @@ class RadioDuckSpectator {
 
     this.socket.on("gameUpdate", (gameState) => {
       this.gameState = gameState;
+      this.updateWinnerDisplay();
     });
+
+    this.socket.on("gameStarted", (gameState) => {
+      this.gameState = gameState;
+      this.updateWinnerDisplay(); // This will hide the winner display since game is now "playing"
+    });
+  }
+
+  updateWinnerDisplay() {
+    const winnerDisplay = document.getElementById("winnerDisplay");
+    const winnerName = document.getElementById("winnerName");
+
+    if (
+      this.gameState &&
+      this.gameState.gameState === "finished" &&
+      this.gameState.winner
+    ) {
+      // Show winner display
+      const winnerIndex = this.gameState.players.findIndex(
+        (player) => player.id === this.gameState.winner.id
+      );
+      const displayName = `Duck ${winnerIndex + 1}`;
+      winnerName.textContent = displayName;
+      winnerDisplay.classList.add("show");
+    } else {
+      // Hide winner display (when game is waiting or playing)
+      winnerDisplay.classList.remove("show");
+    }
   }
 
   gameLoop() {
