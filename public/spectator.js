@@ -16,6 +16,22 @@ class RadioDuckSpectator {
       this.duckImageLoaded = true;
     };
 
+    // Load quack sound effects
+    this.quackSounds = [];
+    this.soundsLoaded = 0;
+
+    for (let i = 1; i <= 7; i++) {
+      const audio = new Audio(`/audio/quack${i}.mp3`);
+      audio.preload = "auto";
+      audio.volume = 1; // Adjust volume as needed
+
+      audio.addEventListener("canplaythrough", () => {
+        this.soundsLoaded++;
+      });
+
+      this.quackSounds.push(audio);
+    }
+
     // Load winner sound
     this.winnerSound = new Audio("/audio/winner.mp3");
     this.winnerSound.preload = "auto";
@@ -60,6 +76,7 @@ class RadioDuckSpectator {
     document
       .getElementById("spectatorStartGameBtn")
       .addEventListener("click", () => {
+        this.enableAudio();
         this.countdownSound.currentTime = 0;
         this.countdownSound.play();
         this.socket.emit("startGame");
@@ -84,6 +101,12 @@ class RadioDuckSpectator {
     this.socket.on("gameStarted", (gameState) => {
       this.gameState = gameState;
       this.updateWinnerDisplay(); // This will hide the winner display since game is now "playing"
+      this.playRandomQuack();
+    });
+
+    this.socket.on("duckCollision", (data) => {
+      // Play quack sound when any duck collision happens
+      this.playRandomQuack();
     });
   }
 
@@ -114,6 +137,37 @@ class RadioDuckSpectator {
       winnerDisplay.classList.remove("show");
       this.lastWinnerId = null; // Reset so sound can play for next winner
     }
+  }
+
+  enableAudio() {
+    // This needs to be called after a user interaction to enable audio
+    const allSounds = [...this.quackSounds, this.winnerSound, this.countdownSound, this.startSound];
+    allSounds.forEach((sound) => {
+        if(sound.HAVE_CURRENT_DATA > 0) {
+            sound.play().then(()=> {
+                sound.pause();
+                sound.currentTime = 0;
+            }).catch(()=>{
+
+            });
+        }
+    });
+  }
+
+  playRandomQuack() {
+    if (this.quackSounds.length === 0) {
+      return;
+    }
+
+    // Pick a random quack sound
+    const randomIndex = Math.floor(Math.random() * this.quackSounds.length);
+    const selectedQuack = this.quackSounds[randomIndex];
+
+    // Reset the audio to beginning in case it was already playing
+    selectedQuack.currentTime = 0;
+
+    // Play the sound (with error handling for browser audio policies)
+    selectedQuack.play();
   }
 
   playWinnerSound() {
