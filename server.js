@@ -107,8 +107,6 @@ class Game {
     if (!player || !player.alive) return;
 
     const acceleration = 2; // Increased acceleration
-    const maxSpeed = 12; // Increased max speed
-    const friction = 0.9; // A bit more friction for snappier feel
 
     // Desired velocity from input
     let dx = 0;
@@ -129,41 +127,50 @@ class Game {
     // Apply acceleration to velocity
     player.vx += dx * acceleration;
     player.vy += dy * acceleration;
+  }
 
-    // Apply friction
-    player.vx *= friction;
-    player.vy *= friction;
+  update() {
+    const maxSpeed = 12; // Increased max speed
+    const friction = 0.9; // A bit more friction for snappier feel
 
-    // Limit speed
-    const speed = Math.sqrt(player.vx * player.vx + player.vy * player.vy);
-    if (speed > maxSpeed) {
-      player.vx = (player.vx / speed) * maxSpeed;
-      player.vy = (player.vy / speed) * maxSpeed;
-    }
+    this.players.forEach((player) => {
+      if (!player.alive) return;
 
-    // Deadzone to prevent jittering when stopping
-    if (speed < 0.1) {
-      player.vx = 0;
-      player.vy = 0;
-    }
+      // Apply friction
+      player.vx *= friction;
+      player.vy *= friction;
 
-    // Update angle to face the direction of movement
-    if (Math.abs(player.vx) > 0.1 || Math.abs(player.vy) > 0.1) {
-      player.angle = Math.atan2(player.vy, player.vx);
-    }
+      // Limit speed
+      const speed = Math.sqrt(player.vx * player.vx + player.vy * player.vy);
+      if (speed > maxSpeed) {
+        player.vx = (player.vx / speed) * maxSpeed;
+        player.vy = (player.vy / speed) * maxSpeed;
+      }
 
-    // Update position
-    player.x += player.vx;
-    player.y += player.vy;
+      // Deadzone to prevent jittering when stopping
+      if (speed < 0.1) {
+        player.vx = 0;
+        player.vy = 0;
+      }
 
-    // Check if player fell off
-    const distanceFromCenter = Math.sqrt(
-      player.x * player.x + player.y * player.y
-    );
-    if (distanceFromCenter > GAME_CONFIG.ARENA_RADIUS) {
-      player.alive = false;
-      this.checkGameEnd();
-    }
+      // Update angle to face the direction of movement
+      if (Math.abs(player.vx) > 0.1 || Math.abs(player.vy) > 0.1) {
+        player.angle = Math.atan2(player.vy, player.vx);
+      }
+
+      // Update position
+      player.x += player.vx;
+      player.y += player.vy;
+
+      // Check if player fell off
+      const distanceFromCenter = Math.sqrt(
+        player.x * player.x + player.y * player.y
+      );
+      if (distanceFromCenter > GAME_CONFIG.ARENA_RADIUS) {
+        player.alive = false;
+        this.checkGameEnd();
+      }
+    });
   }
 
   handleCollisions() {
@@ -208,16 +215,17 @@ class Game {
           p2.x += separateX;
           p2.y += separateY;
 
-          // Much stronger velocity transfer for bouncy collisions
-          const pushForce = 2.5; // Significantly increased from 1.2
-          const velocityTransfer = 0.5; // Reduced velocity transfer to make bounces cleaner
-          const tempVx = p1.vx;
-          const tempVy = p1.vy;
+          const repulsionForce = 10;
+          const nx = dx / distance;
+          const ny = dy / distance;
 
-          p1.vx = p2.vx * velocityTransfer + (dx / distance) * pushForce;
-          p1.vy = p2.vy * velocityTransfer + (dy / distance) * pushForce;
-          p2.vx = tempVx * velocityTransfer - (dx / distance) * pushForce;
-          p2.vy = tempVy * velocityTransfer - (dy / distance) * pushForce;
+          // Repel p1
+          p1.vx -= nx * repulsionForce;
+          p1.vy -= ny * repulsionForce;
+
+          // Repel p2
+          p2.vx += nx * repulsionForce;
+          p2.vy += ny * repulsionForce;
 
           // Record collision time for cooldown
           this.lastCollisions.set(collisionKey, now);
@@ -401,6 +409,7 @@ io.on("connection", (socket) => {
 setInterval(() => {
   lobbies.forEach((lobby) => {
     if (lobby.gameState === "playing") {
+      lobby.update();
       lobby.handleCollisions();
 
       // Only send updates if something actually changed
