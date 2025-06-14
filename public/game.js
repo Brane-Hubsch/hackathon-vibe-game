@@ -50,11 +50,6 @@ class RadioDuckGame {
 
       audio.addEventListener("canplaythrough", () => {
         this.soundsLoaded++;
-        console.log(`Quack${i}.mp3 loaded (${this.soundsLoaded}/7)`);
-      });
-
-      audio.addEventListener("error", (e) => {
-        console.error(`Failed to load quack${i}.mp3:`, e);
       });
 
       this.quackSounds.push(audio);
@@ -180,7 +175,6 @@ class RadioDuckGame {
 
     this.socket.on("duckCollision", (data) => {
       // Play quack sound when any duck collision happens
-      console.log("🦆 Duck collision - playing quack!");
       this.playRandomQuack();
     });
   }
@@ -220,13 +214,15 @@ class RadioDuckGame {
     };
 
     const elements = [joystickBase, joystickKnob];
-    elements.forEach(el => {
-        el.addEventListener("touchstart", (e) => startJoystick(e, e.touches[0]));
-        el.addEventListener("mousedown", (e) => startJoystick(e, e));
-        el.addEventListener("contextmenu", (e) => e.preventDefault());
+    elements.forEach((el) => {
+      el.addEventListener("touchstart", (e) => startJoystick(e, e.touches[0]));
+      el.addEventListener("mousedown", (e) => startJoystick(e, e));
+      el.addEventListener("contextmenu", (e) => e.preventDefault());
     });
 
-    document.addEventListener("touchmove", (e) => moveJoystick(e, e.touches[0]));
+    document.addEventListener("touchmove", (e) =>
+      moveJoystick(e, e.touches[0])
+    );
     document.addEventListener("mousemove", (e) => moveJoystick(e, e));
     document.addEventListener("touchend", endJoystick);
     document.addEventListener("mouseup", endJoystick);
@@ -289,9 +285,6 @@ class RadioDuckGame {
   }
 
   enableAudio() {
-    // Pre-load and enable audio on user interaction
-    console.log("Enabling audio with", this.quackSounds.length, "quack sounds");
-
     this.quackSounds.forEach((audio, index) => {
       audio.load();
       // Test play one sound to unlock audio context
@@ -299,20 +292,16 @@ class RadioDuckGame {
         audio
           .play()
           .then(() => {
-            console.log("Audio context unlocked successfully");
             audio.pause();
             audio.currentTime = 0;
           })
-          .catch((error) => {
-            console.log("Audio unlock failed:", error);
-          });
+          .catch((error) => {});
       }
     });
   }
 
   playRandomQuack() {
     if (this.quackSounds.length === 0) {
-      console.log("No quack sounds loaded");
       return;
     }
 
@@ -320,20 +309,11 @@ class RadioDuckGame {
     const randomIndex = Math.floor(Math.random() * this.quackSounds.length);
     const selectedQuack = this.quackSounds[randomIndex];
 
-    console.log(`Playing quack${randomIndex + 1}.mp3`);
-
     // Reset the audio to beginning in case it was already playing
     selectedQuack.currentTime = 0;
 
     // Play the sound (with error handling for browser audio policies)
-    selectedQuack
-      .play()
-      .then(() => {
-        console.log("Quack played successfully");
-      })
-      .catch((error) => {
-        console.log("Audio play failed:", error);
-      });
+    selectedQuack.play();
   }
 
   showScreen(screenId) {

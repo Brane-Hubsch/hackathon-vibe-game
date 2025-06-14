@@ -76,11 +76,9 @@ class Game {
   startGame() {
     // This method can now be called at any time to start/restart.
     if (this.players.size < 2) {
-      console.log("Spectator tried to start game with less than 2 players.");
       return false;
     }
 
-    console.log("Starting/restarting game...");
     this.gameState = "playing";
     this.startTime = Date.now();
     this.winner = null;
@@ -199,12 +197,6 @@ class Game {
             continue; // Skip this collision, still in cooldown
           }
 
-          console.log(
-            `Duck collision: ${p1.name} vs ${
-              p2.name
-            } (distance: ${distance.toFixed(1)})`
-          );
-
           // Much more aggressive separation to prevent sticking
           const overlap = GAME_CONFIG.DUCK_SIZE - distance;
           const separationForce = 2.0; // Increased separation force
@@ -316,8 +308,6 @@ const spectators = new Map(); // Track spectators
 
 // Socket handling
 io.on("connection", (socket) => {
-  console.log("Player connected:", socket.id);
-
   socket.on("joinLobby", () => {
     const lobby = lobbies.get(SINGLE_LOBBY_ID);
 
@@ -387,8 +377,6 @@ io.on("connection", (socket) => {
   });
 
   socket.on("disconnect", () => {
-    console.log("Player disconnected:", socket.id);
-
     // Handle player disconnect
     const playerData = players.get(socket.id);
     if (playerData) {

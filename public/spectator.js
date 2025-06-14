@@ -39,14 +39,15 @@ class RadioDuckSpectator {
 
   setupEventListeners() {
     // Spectator controls
-    document.getElementById("spectatorStartGameBtn").addEventListener("click", () => {
-      this.socket.emit("startGame");
-    });
+    document
+      .getElementById("spectatorStartGameBtn")
+      .addEventListener("click", () => {
+        this.socket.emit("startGame");
+      });
   }
 
   setupSocketListeners() {
     this.socket.on("connect", () => {
-      console.log("Connected as spectator, joining main lobby...");
       this.socket.emit("spectateGame");
     });
 
@@ -159,4 +160,4 @@ class RadioDuckSpectator {
 // Initialize spectator when DOM is loaded
 document.addEventListener("DOMContentLoaded", () => {
   new RadioDuckSpectator();
-}); 
+});
