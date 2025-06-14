@@ -27,6 +27,8 @@ class Game {
     this.startTime = null;
     this.winner = null;
     this.lastCollisions = new Map(); // Track collision cooldowns
+    this.lastSentState = null;
+    this.lastCollisionSounds = new Map(); // Track collision sound cooldowns
   }
 
   addPlayer(playerId, playerData) {
@@ -106,8 +108,8 @@ class Game {
     const player = this.players.get(playerId);
     if (!player || !player.alive) return;
 
-    const acceleration = 1; // Simplified acceleration
-    const maxSpeed = 4;
+    const acceleration = 1.5; // Increased acceleration
+    const maxSpeed = 6; // Increased max speed
     const friction = 0.9; // A bit more friction for snappier feel
 
     // Desired velocity from input
@@ -228,13 +230,20 @@ class Game {
           // Record collision time for cooldown
           this.lastCollisions.set(collisionKey, now);
 
-          // Emit collision sound event to all players in the lobby
-          io.to(this.id).emit("duckCollision", {
-            player1: p1.id,
-            player2: p2.id,
-            x: (p1.x + p2.x) / 2,
-            y: (p1.y + p2.y) / 2,
-          });
+          // Throttle collision sound events to prevent audio spam
+          const soundKey = `sound-${collisionKey}`;
+          const lastSoundTime = this.lastCollisionSounds.get(soundKey) || 0;
+
+          if (now - lastSoundTime > 200) {
+            // Only emit sound every 200ms per pair
+            io.to(this.id).emit("duckCollision", {
+              player1: p1.id,
+              player2: p2.id,
+              x: (p1.x + p2.x) / 2,
+              y: (p1.y + p2.y) / 2,
+            });
+            this.lastCollisionSounds.set(soundKey, now);
+          }
         }
       }
     }
@@ -274,6 +283,27 @@ class Game {
           : 0,
       winner: this.winner,
     };
+  }
+
+  checkForChanges(gameState) {
+    if (!this.lastSentState) return true;
+
+    // Compare key game state properties instead of full JSON stringify
+    const current = gameState.players;
+    const last = this.lastSentState.players;
+
+    if (current.length !== last.length) return true;
+
+    for (let i = 0; i < current.length; i++) {
+      const c = current[i];
+      const l = last[i];
+
+      // Check if position changed significantly (> 0.5 pixel for smoother movement)
+      if (Math.abs(c.x - l.x) > 0.5 || Math.abs(c.y - l.y) > 0.5) return true;
+      if (c.alive !== l.alive) return true;
+    }
+
+    return false;
   }
 }
 
@@ -384,10 +414,18 @@ setInterval(() => {
   lobbies.forEach((lobby) => {
     if (lobby.gameState === "playing") {
       lobby.handleCollisions();
-      io.to(lobby.id).emit("gameUpdate", lobby.getGameState());
+
+      // Only send updates if something actually changed
+      const gameState = lobby.getGameState();
+      const hasChanges = lobby.checkForChanges(gameState);
+
+      if (hasChanges) {
+        io.to(lobby.id).emit("gameUpdate", gameState);
+        lobby.lastSentState = JSON.parse(JSON.stringify(gameState));
+      }
     }
   });
-}, 1000 / 25); // 25 FPS
+}, 1000 / 30); // 30 FPS
 
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {

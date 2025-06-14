@@ -13,6 +13,11 @@ class RadioDuckGame {
       right: false,
     };
 
+    // Input throttling
+    this.lastInputSent = 0;
+    this.inputThrottleMs = 33; // Send input max every 33ms (30 FPS)
+    this.lastInput = { ...this.input };
+
     // Joystick state
     this.joystick = {
       active: false,
@@ -357,7 +362,8 @@ class RadioDuckGame {
     if (this.gameState.winner) {
       if (this.gameState.winner.id === this.playerId) {
         gameOverTitle.textContent = "You Won! 🏆";
-        winnerInfo.textContent = "Congratulations! You are the last duck standing!";
+        winnerInfo.textContent =
+          "Congratulations! You are the last duck standing!";
       } else {
         gameOverTitle.textContent = "Game Over";
         winnerInfo.textContent = "Another duck won this round!";
@@ -370,8 +376,16 @@ class RadioDuckGame {
 
   gameLoop() {
     if (this.gameState && this.gameState.gameState === "playing") {
-      // Send input to server
-      this.socket.emit("playerInput", this.input);
+      // Throttle input sending to reduce network traffic
+      const now = Date.now();
+      const inputChanged =
+        JSON.stringify(this.input) !== JSON.stringify(this.lastInput);
+
+      if (inputChanged || now - this.lastInputSent > this.inputThrottleMs) {
+        this.socket.emit("playerInput", this.input);
+        this.lastInput = { ...this.input };
+        this.lastInputSent = now;
+      }
 
       // Render game
       this.render();
