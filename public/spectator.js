@@ -20,11 +20,6 @@ class RadioDuckSpectator {
     this.setupEventListeners();
     this.setupSocketListeners();
     this.gameLoop();
-    
-    // Setup QR code after a short delay to ensure DOM is ready
-    setTimeout(() => {
-      this.setupQRCode();
-    }, 500);
   }
 
   setupCanvas() {
@@ -40,66 +35,6 @@ class RadioDuckSpectator {
     // Initial resize
     setTimeout(resizeCanvas, 100); // Delay to ensure CSS is applied
     window.addEventListener("resize", resizeCanvas);
-  }
-
-  setupQRCode() {
-    // Generate QR code pointing to the game URL
-    const gameUrl = window.location.origin;
-    const qrCanvas = document.getElementById('qrcode');
-    
-    if (qrCanvas) {
-      // Set canvas size explicitly
-      qrCanvas.width = 150;
-      qrCanvas.height = 150;
-      
-      if (typeof QRCode !== 'undefined') {
-        QRCode.toCanvas(qrCanvas, gameUrl, {
-          width: 150,
-          height: 150,
-          margin: 2,
-          color: {
-            dark: '#000000',    // Black QR code
-            light: '#FFFFFF'    // White background
-          },
-          errorCorrectionLevel: 'M'
-        }, (error) => {
-          if (error) {
-            console.error('QR Code generation failed:', error);
-            this.createFallbackQR(qrCanvas, gameUrl);
-          } else {
-            console.log('QR Code generated successfully');
-          }
-        });
-      } else {
-        console.error('QRCode library not loaded');
-        this.createFallbackQR(qrCanvas, gameUrl);
-      }
-    }
-  }
-
-  createFallbackQR(canvas, url) {
-    // Fallback: create a simple text-based indicator
-    const ctx = canvas.getContext('2d');
-    canvas.width = 150;
-    canvas.height = 150;
-    
-    // White background
-    ctx.fillStyle = '#FFFFFF';
-    ctx.fillRect(0, 0, 150, 150);
-    
-    // Black border
-    ctx.strokeStyle = '#000000';
-    ctx.lineWidth = 2;
-    ctx.strokeRect(0, 0, 150, 150);
-    
-    // Text
-    ctx.fillStyle = '#000000';
-    ctx.font = 'bold 14px Arial';
-    ctx.textAlign = 'center';
-    ctx.fillText('QR CODE', 75, 70);
-    ctx.fillText('FAILED', 75, 90);
-    
-    console.log('Using fallback QR display');
   }
 
   setupEventListeners() {

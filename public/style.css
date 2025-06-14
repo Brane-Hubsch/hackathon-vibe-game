@@ -344,6 +344,7 @@ input[type="text"] {
   align-items: stretch;
   justify-content: stretch;
   flex-direction: row;
+  position: relative;
 }
 
 .spectator-left {
@@ -360,6 +361,7 @@ input[type="text"] {
   align-items: center;
   justify-content: center;
   padding: 20px;
+  gap: 15px;
 }
 
 .spectator-right {
@@ -373,11 +375,13 @@ input[type="text"] {
 .sumo-duck-logo {
   display: flex;
   align-items: center;
-  gap: 8px;
-  font-size: 3em;
-  font-weight: bold;
-  color: white;
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+  justify-content: center;
+}
+
+.sumo-duck-logo img {
+  width: 100%;
+  max-width: 450px;
+  height: auto;
 }
 
 .logo-text {
@@ -398,14 +402,12 @@ input[type="text"] {
 }
 
 #qrcode {
-  background: white;
-  padding: 15px;
-  border-radius: 15px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-  border: 2px solid #ffffff;
   display: block;
-  max-width: 180px;
-  max-height: 180px;
+  width: 280px;
+  height: 280px;
+  border-radius: 15px;
+  background: #fff;
+  padding: 10px;
 }
 
 .qr-text {
@@ -468,9 +470,16 @@ input[type="text"] {
 }
 
 .spectator-controls {
-  margin-top: 20px;
-  text-align: center;
-  color: white;
+  position: absolute;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+#spectatorStartGameBtn {
+  padding: 20px 40px;
+  font-size: 1.5em;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.4);
 }
 
 #spectatorGameStatus {
@@ -478,9 +487,4 @@ input[type="text"] {
   font-weight: bold;
   margin-bottom: 15px;
   text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
-}
-
-#spectatorStartGameBtn {
-  padding: 15px 30px;
-  font-size: 1.2em;
 }

@@ -22,9 +22,7 @@
       <div id="spectatorGameScreen" class="screen active spectator-layout">
         <div class="spectator-left">
           <div class="sumo-duck-logo">
-            <span class="logo-text">SUMO</span>
-            <span class="logo-duck">🦆</span>
-            <span class="logo-text">DUCK</span>
+            <img src="/images/sumoduck-logo.svg" alt="Sumo Duck Logo" />
           </div>
         </div>
         
@@ -36,17 +34,16 @@
         
         <div class="spectator-right">
           <div class="qr-section">
-            <canvas id="qrcode"></canvas>
+            <img id="qrcode" src="/images/sumoduck-qr.png" alt="Join The Game QR Code" />
             <div class="qr-text">JOIN THE GAME!</div>
           </div>
-          <div class="spectator-controls">
-            <button id="spectatorStartGameBtn" class="btn btn-primary">Start / Restart Game</button>
-          </div>
+        </div>
+        <div class="spectator-controls">
+          <button id="spectatorStartGameBtn" class="btn btn-primary">Start Game!</button>
         </div>
       </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.4/lib/browser.min.js"></script>
     <script src="/socket.io/socket.io.js"></script>
     <script src="spectator.js"></script>
   </body>
