@@ -370,7 +370,7 @@ setInterval(() => {
       io.to(lobby.id).emit("gameUpdate", lobby.getGameState());
     }
   });
-}, 1000 / 60); // 60 FPS
+}, 1000 / 25); // 25 FPS
 
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {
