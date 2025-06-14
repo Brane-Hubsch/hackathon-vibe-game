@@ -527,7 +527,7 @@ class RadioDuckGame {
     ctx.rotate(player.angle + Math.PI / 2); // Add 90-degree rotation to fix orientation
 
     // Draw the duck image (centered) - no color tinting needed
-    const duckSize = 50; // Increased size for cuter, easier to hit ducks
+    const duckSize = 70; // Increased size for cuter, easier to hit ducks
     ctx.drawImage(
       this.duckImage,
       -duckSize / 2,
@@ -543,7 +543,7 @@ class RadioDuckGame {
       ctx.strokeStyle = "#ffffff";
       ctx.lineWidth = 4;
       ctx.beginPath();
-      ctx.arc(0, 0, 32, 0, Math.PI * 2); // Adjusted for larger duck size
+      ctx.arc(0, 0, 52, 0, Math.PI * 2); // Adjusted for larger duck size
       ctx.stroke();
 
       // Add a subtle glow effect
@@ -552,7 +552,7 @@ class RadioDuckGame {
       ctx.strokeStyle = "rgba(255, 255, 255, 0.5)";
       ctx.lineWidth = 2;
       ctx.beginPath();
-      ctx.arc(0, 0, 36, 0, Math.PI * 2); // Adjusted for larger duck size
+      ctx.arc(0, 0, 56, 0, Math.PI * 2); // Adjusted for larger duck size
       ctx.stroke();
       ctx.shadowBlur = 0;
     }

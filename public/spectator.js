@@ -255,7 +255,7 @@ class RadioDuckSpectator {
     ctx.rotate(player.angle + Math.PI / 2); // Add 90-degree rotation to fix orientation
 
     // Draw the duck image (centered)
-    const duckSize = 40;
+    const duckSize = 70;
     ctx.drawImage(
       this.duckImage,
       -duckSize / 2,
@@ -270,7 +270,7 @@ class RadioDuckSpectator {
     ctx.strokeStyle = player.color;
     ctx.lineWidth = 3;
     ctx.beginPath();
-    ctx.arc(0, 0, 25, 0, Math.PI * 2);
+    ctx.arc(0, 0, 38, 0, Math.PI * 2);
     ctx.stroke();
 
     ctx.restore();
