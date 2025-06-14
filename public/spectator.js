@@ -182,11 +182,11 @@ class RadioDuckSpectator {
     
     container.innerHTML = "";
 
-    this.gameState.players.forEach((player) => {
+    this.gameState.players.forEach((player, index) => {
       const playerCard = document.createElement("div");
       playerCard.className = "player-card";
       playerCard.style.borderColor = player.color;
-      playerCard.textContent = player.name;
+      playerCard.textContent = `Duck ${index + 1}`;
       container.appendChild(playerCard);
     });
 
@@ -244,7 +244,7 @@ class RadioDuckSpectator {
     if (this.gameState.winner) {
       document.getElementById("gameOverTitle").textContent = "Game Over!";
       if (winnerInfo) {
-        winnerInfo.innerHTML = `<p>🏆 Winner: <strong>${this.gameState.winner.name}</strong></p>`;
+        winnerInfo.innerHTML = "<p>🏆 A duck won this round!</p>";
       }
     } else {
       document.getElementById("gameOverTitle").textContent = "Game Over";
@@ -273,8 +273,9 @@ class RadioDuckSpectator {
         playerResult.style.backgroundColor = index === 0 && player.alive ? "rgba(255, 215, 0, 0.2)" : "rgba(255,255,255,0.1)";
         
         const position = player.alive ? "🏆 Winner" : `💀 Eliminated`;
+        const playerNumber = this.gameState.players.indexOf(player) + 1;
         playerResult.innerHTML = `
-          <div style="font-weight: bold; font-size: 1.1em;">${player.name}</div>
+          <div style="font-weight: bold; font-size: 1.1em;">Duck ${playerNumber}</div>
           <div style="color: #ccc;">${position}</div>
         `;
         
@@ -388,14 +389,7 @@ class RadioDuckSpectator {
       duckSize
     );
 
-    // Player name - bigger and more visible
-    ctx.fillStyle = "#ffffff";
-    ctx.font = "bold 14px Arial";
-    ctx.textAlign = "center";
-    ctx.strokeStyle = "#000000";
-    ctx.lineWidth = 3;
-    ctx.strokeText(player.name, 0, -28);
-    ctx.fillText(player.name, 0, -28);
+    // No player names displayed
 
     // Add colored border around each duck for spectator visibility
     ctx.strokeStyle = player.color;

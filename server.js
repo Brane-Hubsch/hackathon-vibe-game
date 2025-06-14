@@ -45,7 +45,6 @@ class Game {
 
     this.players.set(playerId, {
       id: playerId,
-      name: playerData.name,
       x: Math.cos(angle) * spawnRadius,
       y: Math.sin(angle) * spawnRadius,
       vx: 0,
@@ -252,7 +251,7 @@ io.on("connection", (socket) => {
   console.log("Player connected:", socket.id);
 
   socket.on("joinLobby", (data) => {
-    const { lobbyId, playerName } = data;
+    const { lobbyId } = data;
     let lobby;
 
     if (lobbyId && lobbies.has(lobbyId)) {
@@ -263,9 +262,9 @@ io.on("connection", (socket) => {
       lobbies.set(newLobbyId, lobby);
     }
 
-    if (lobby.addPlayer(socket.id, { name: playerName })) {
+    if (lobby.addPlayer(socket.id, {})) {
       socket.join(lobby.id);
-      players.set(socket.id, { lobbyId: lobby.id, name: playerName });
+      players.set(socket.id, { lobbyId: lobby.id });
 
       socket.emit("joinedLobby", { lobbyId: lobby.id });
       io.to(lobby.id).emit("gameUpdate", lobby.getGameState());
