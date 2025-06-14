@@ -16,6 +16,21 @@ class RadioDuckSpectator {
       this.duckImageLoaded = true;
     };
 
+    // Load winner sound
+    this.winnerSound = new Audio("/audio/winner.mp3");
+    this.winnerSound.preload = "auto";
+    this.winnerSound.volume = 0.7; // Adjust volume as needed
+    this.lastWinnerId = null; // Track the last winner to avoid replaying sound
+    this.winnerSoundLoaded = false;
+
+    this.winnerSound.addEventListener("canplaythrough", () => {
+      this.winnerSoundLoaded = true;
+    });
+
+    this.winnerSound.addEventListener("error", (e) => {
+      console.warn("Winner sound failed to load:", e);
+    });
+
     this.setupCanvas();
     this.setupEventListeners();
     this.setupSocketListeners();
@@ -78,9 +93,22 @@ class RadioDuckSpectator {
       const displayName = `Duck ${winnerIndex + 1}`;
       winnerName.textContent = displayName;
       winnerDisplay.classList.add("show");
+
+      // Play winner sound
+      if (this.gameState.winner.id !== this.lastWinnerId) {
+        this.playWinnerSound();
+        this.lastWinnerId = this.gameState.winner.id;
+      }
     } else {
       // Hide winner display (when game is waiting or playing)
       winnerDisplay.classList.remove("show");
+      this.lastWinnerId = null; // Reset so sound can play for next winner
+    }
+  }
+
+  playWinnerSound() {
+    if (this.winnerSoundLoaded) {
+      this.winnerSound.play();
     }
   }
 
