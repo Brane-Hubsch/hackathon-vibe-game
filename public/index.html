@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0, minimum-scale=1.0, shrink-to-fit=no"
+    />
+    <meta name="format-detection" content="telephone=no" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta
+      name="apple-mobile-web-app-status-bar-style"
+      content="black-translucent"
+    />
+    <meta name="apple-touch-fullscreen" content="yes" />
+    <title>Radio Duck Battle</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div id="app">
+      <!-- Lobby Screen -->
+      <div id="lobbyScreen" class="screen active">
+        <div class="container">
+          <h2>Welcome to SumoDuck!</h2>
+          <div id="userDuckInfo">
+            <h3>You are: <span id="userDuckName">Loading...</span></h3>
+          </div>
+          <p class="info">Waiting for the game to start...</p>
+        </div>
+      </div>
+
+      <!-- Game Screen -->
+      <div id="gameScreen" class="screen">
+        <div id="gameContainer">
+          <div id="gameView">
+            <canvas id="gameCanvas"></canvas>
+            <div id="gameUI">
+              <div id="playerNameDisplay" class="player-name-hud">
+                <span id="playerNameText">Loading...</span>
+              </div>
+              <div id="countdown"></div>
+            </div>
+          </div>
+          <div id="controlsArea">
+            <div id="controls">
+              <div id="joystick">
+                <div id="joystickBase"></div>
+                <div id="joystickKnob"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Game Over Screen -->
+      <div id="gameOverScreen" class="screen">
+        <div class="container">
+          <h2 id="gameOverTitle">Game Over!</h2>
+          <div id="winnerInfo"></div>
+          <p class="info">Waiting for the next game to start.</p>
+        </div>
+      </div>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="game.js"></script>
+  </body>
+</html>

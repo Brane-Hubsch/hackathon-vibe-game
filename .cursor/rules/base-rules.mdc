@@ -1,0 +1,6 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+Our server has Nodejs and Caddy installed. Make sure our game can be ran on this server. Other than that, choose the web tech that you feel most confortable.

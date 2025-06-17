@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0, minimum-scale=1.0, shrink-to-fit=no"
+    />
+    <meta name="format-detection" content="telephone=no" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta
+      name="apple-mobile-web-app-status-bar-style"
+      content="black-translucent"
+    />
+    <meta name="apple-touch-fullscreen" content="yes" />
+    <title>Radio Duck Battle - Spectator</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div id="app">
+      <!-- Spectator Game Screen -->
+      <div id="spectatorGameScreen" class="screen active spectator-layout">
+        <div class="spectator-left">
+          <div class="sumo-duck-logo">
+            <img src="/images/sumoduck-logo.svg" alt="Sumo Duck Logo" />
+          </div>
+        </div>
+
+        <div class="spectator-center">
+          <div class="game-display">
+            <canvas id="gameCanvas"></canvas>
+            <!-- Winner display overlay -->
+            <div id="winnerDisplay" class="winner-overlay">
+              <div class="winner-content">
+                <h1 id="winnerTitle">🏆 WINNER! 🏆</h1>
+                <h2 id="winnerName">Winner</h2>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="spectator-right">
+          <div class="qr-section">
+            <img
+              id="qrcode"
+              src="/images/sumoduck-qr.png"
+              alt="Join The Game QR Code"
+            />
+            <div class="qr-text">JOIN THE GAME!</div>
+          </div>
+        </div>
+        <div class="spectator-controls">
+          <button id="spectatorStartGameBtn" class="btn btn-primary">
+            Start Game!
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="spectator.js"></script>
+  </body>
+</html>
